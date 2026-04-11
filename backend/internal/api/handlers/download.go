@@ -1,6 +1,7 @@
 package handlers
 
 import (
+    "strings"
     "encoding/json"
     "net/http"
 
@@ -12,7 +13,8 @@ type DownloadRequest struct {
 }
 
 type DownloadResponse struct {
-    FileID string `json:"file_id"`
+    FileID      string `json:"file_id"`
+    DownloadURL string `json:"download_url"`
 }
 
 type DownloadHandler struct {
@@ -38,8 +40,24 @@ func (h *DownloadHandler) Download(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    res := DownloadResponse{FileID: fileID}
+    res := DownloadResponse{
+        FileID:      fileID,
+        DownloadURL: "/file/" + fileID,
+    }
 
     w.Header().Set("Content-Type", "application/json")
     json.NewEncoder(w).Encode(res)
+}
+
+func (h *DownloadHandler) GetFile(w http.ResponseWriter, r *http.Request) {
+    fileID := strings.TrimPrefix(r.URL.Path, "/file/")
+
+    path, err := h.downloader.GetFilePath(fileID)
+    if err != nil {
+        http.Error(w, "file not found", http.StatusNotFound)
+        return
+    }
+
+    w.Header().Set("Content-Disposition", "attachment; filename=\""+fileID+"\"")
+    http.ServeFile(w, r, path)
 }

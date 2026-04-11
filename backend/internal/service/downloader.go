@@ -32,3 +32,7 @@ func (d *Downloader) Download(url string) (string, error) {
 
     return fileID, nil
 }
+
+func (d *Downloader) GetFilePath(fileID string) (string, error) {
+    return d.storage.Get(fileID)
+}
