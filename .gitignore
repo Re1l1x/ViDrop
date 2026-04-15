@@ -65,6 +65,10 @@ go.work.sum
 # env file
 .env
 
+# storage
+temp/
+downloads/
+
 
 
 # IDE 
