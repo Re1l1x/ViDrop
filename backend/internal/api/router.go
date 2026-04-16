@@ -3,31 +3,10 @@ package api
 import (
 	"net/http"
 
-    "ViDrop/internal/api/handlers"
+	"ViDrop/internal/api/handlers"
 )
 
-func RegisterRoutes(mux *http.ServeMux, h *handlers.DownloadHandler) {
-    mux.HandleFunc("/download", func(w http.ResponseWriter, r *http.Request) {
-        w.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
-        w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
-        w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
-        if r.Method == http.MethodOptions {
-            w.WriteHeader(http.StatusNoContent)
-            return
-        }
-
-        h.Download(w, r)
-    })
-
-    mux.HandleFunc("/file/", func(w http.ResponseWriter, r *http.Request) {
-        w.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
-        w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
-        w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
-        if r.Method == http.MethodOptions {
-            w.WriteHeader(http.StatusNoContent)
-            return
-        }
-
-        h.GetFile(w, r)
-    })
+func RegisterRoutes(mux *http.ServeMux, downloadHandler *handlers.DownloadHandler) {
+    mux.HandleFunc("/download", downloadHandler.Download)
+    mux.HandleFunc("/file/", downloadHandler.GetFile)
 }

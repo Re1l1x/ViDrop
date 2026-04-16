@@ -1,16 +1,17 @@
 package main
 
 import (
-    "log"
-    "time"
-    "net/http"
+	"log"
+	"net/http"
+	"time"
 
-    "ViDrop/internal/config"
-    "ViDrop/internal/api"
-    "ViDrop/internal/api/handlers"
-    "ViDrop/internal/service"
-    "ViDrop/internal/storage"
-    "ViDrop/internal/yt"
+	"ViDrop/internal/api"
+	"ViDrop/internal/api/handlers"
+	"ViDrop/internal/config"
+	"ViDrop/internal/middleware"
+	"ViDrop/internal/service"
+	"ViDrop/internal/storage"
+	"ViDrop/internal/yt"
 )
 
 func main() {
@@ -29,7 +30,7 @@ func main() {
 
     server := &http.Server{
 		Addr:         ":8080",
-		Handler:      mux,
+		Handler:      middleware.Middleware(mux),
 		ReadTimeout:  15 * time.Second,
 		WriteTimeout: 30 * time.Second,
 		IdleTimeout:  60 * time.Second,
