@@ -20,7 +20,7 @@ export default function Home() {
             });
 
             const result = await response.json();
-            setDownloadUrl(result.DownloadURL);
+            setDownloadUrl(result.download_url);
         } catch (error) {
             const e = error as Error;
             console.error(e.message);
