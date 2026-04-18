@@ -7,6 +7,7 @@ import (
 )
 
 func RegisterRoutes(mux *http.ServeMux, downloadHandler *handlers.DownloadHandler) {
+	mux.HandleFunc("/info", downloadHandler.GetInfo)
     mux.HandleFunc("/download", downloadHandler.Download)
     mux.HandleFunc("/file/", downloadHandler.GetFile)
 }

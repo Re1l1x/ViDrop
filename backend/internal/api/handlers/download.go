@@ -8,6 +8,15 @@ import (
     "ViDrop/internal/service"
 )
 
+type InfoRequest struct {
+    URL string `json:"url"`
+}
+
+type InfoResponse struct {
+    Title     string `json:"title"`
+	Thumbnail string `json:"thumbnail"`
+}
+
 type DownloadRequest struct {
     URL string `json:"url"`
 }
@@ -23,6 +32,30 @@ type DownloadHandler struct {
 
 func NewDownloadHandler(d *service.Downloader) *DownloadHandler {
     return &DownloadHandler{downloader: d}
+}
+
+func (h *DownloadHandler) GetInfo(w http.ResponseWriter, r *http.Request) {
+    var req InfoRequest
+
+    err := json.NewDecoder(r.Body).Decode(&req)
+    if err != nil {
+        http.Error(w, "invalid request", http.StatusBadRequest)
+        return
+    }
+
+    info, err := h.downloader.GetInfo(req.URL)
+    if err != nil {
+        http.Error(w, err.Error(), http.StatusInternalServerError)
+        return
+    }
+
+    res := InfoResponse{
+        Title:     info.Title,
+        Thumbnail: info.Thumbnail,
+    }
+
+    w.Header().Set("Content-Type", "application/json")
+    json.NewEncoder(w).Encode(res)
 }
 
 func (h *DownloadHandler) Download(w http.ResponseWriter, r *http.Request) {

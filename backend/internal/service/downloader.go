@@ -19,6 +19,10 @@ func NewDownloader(ytClient *yt.YtDlp, storage storage.Storage) *Downloader {
     }
 }
 
+func (d *Downloader) GetInfo(url string) (yt.VideoInfo, error) {
+    return d.yt.GetInfo(url)
+}
+
 func (d *Downloader) Download(url string) (string, error) {
     filePath, err := d.yt.Download(url)
     if err != nil {
