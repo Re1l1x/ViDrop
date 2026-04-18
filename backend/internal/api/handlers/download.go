@@ -5,26 +5,9 @@ import (
     "encoding/json"
     "net/http"
 
+    "ViDrop/internal/api/handlers/dto"
     "ViDrop/internal/service"
 )
-
-type InfoRequest struct {
-    URL string `json:"url"`
-}
-
-type InfoResponse struct {
-    Title     string `json:"title"`
-	Thumbnail string `json:"thumbnail"`
-}
-
-type DownloadRequest struct {
-    URL string `json:"url"`
-}
-
-type DownloadResponse struct {
-    FileID      string `json:"file_id"`
-    DownloadURL string `json:"download_url"`
-}
 
 type DownloadHandler struct {
     downloader *service.Downloader
@@ -35,7 +18,7 @@ func NewDownloadHandler(d *service.Downloader) *DownloadHandler {
 }
 
 func (h *DownloadHandler) GetInfo(w http.ResponseWriter, r *http.Request) {
-    var req InfoRequest
+    var req dto.InfoRequest
 
     err := json.NewDecoder(r.Body).Decode(&req)
     if err != nil {
@@ -49,7 +32,7 @@ func (h *DownloadHandler) GetInfo(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    res := InfoResponse{
+    res := dto.InfoResponse{
         Title:     info.Title,
         Thumbnail: info.Thumbnail,
     }
@@ -59,7 +42,7 @@ func (h *DownloadHandler) GetInfo(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *DownloadHandler) Download(w http.ResponseWriter, r *http.Request) {
-    var req DownloadRequest
+    var req dto.DownloadRequest
 
     err := json.NewDecoder(r.Body).Decode(&req)
     if err != nil {
@@ -73,7 +56,7 @@ func (h *DownloadHandler) Download(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    res := DownloadResponse{
+    res := dto.DownloadResponse{
         FileID:      fileID,
         DownloadURL: "/file/" + fileID,
     }
