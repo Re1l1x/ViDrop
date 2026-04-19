@@ -1,10 +1,12 @@
 package yt
 
 import (
+    "fmt"
 	"strings"
 	"os/exec"
     "encoding/json"
 	"path/filepath"
+    "sort"
 )
 
 type YtDlp struct {
@@ -16,28 +18,73 @@ func New(outputDir string) *YtDlp {
 }
 
 type VideoInfo struct {
-    Title     string `json:"title"`
-    Thumbnail string `json:"thumbnail"`
+	Title          string   `json:"title"`
+	Thumbnail      string   `json:"thumbnail"`
+	Resolutions    []string `json:"resolutions"`
+	AudioBitrates  []string `json:"audio_bitrates"`
+}
+
+type ytResponse struct {
+	Title     string   `json:"title"`
+	Thumbnail string   `json:"thumbnail"`
+	Formats   []format `json:"formats"`
+}
+
+type format struct {
+	Height int     `json:"height"`
+	VCodec string  `json:"vcodec"`
+	ACodec string  `json:"acodec"`
+	ABR    float64 `json:"abr"`
 }
 
 func (y *YtDlp) GetInfo(url string) (VideoInfo, error) {
-    cmd := exec.Command("yt-dlp", "-j", url)
+	cmd := exec.Command("yt-dlp", "-j", url)
 
-    out, err := cmd.Output()
-    if err != nil {
-        return VideoInfo{}, err
-    }
+	out, err := cmd.Output()
+	if err != nil {
+		return VideoInfo{}, err
+	}
 
-    var data VideoInfo
+	var raw ytResponse
+	if err := json.Unmarshal(out, &raw); err != nil {
+		return VideoInfo{}, err
+	}
 
-    if err := json.Unmarshal(out, &data); err != nil {
-        return VideoInfo{}, err
-    }
+	resMap := make(map[int]struct{})
+	audioMap := make(map[int]struct{})
 
-    return VideoInfo{
-        Title:     data.Title,
-        Thumbnail: data.Thumbnail,
-    }, nil
+	for _, f := range raw.Formats {
+		if f.VCodec != "none" && f.ACodec == "none" && f.Height > 0 {
+			resMap[f.Height] = struct{}{}
+		}
+
+		if f.VCodec == "none" && f.ACodec != "none" && f.ABR > 0 {
+			audioMap[int(f.ABR)] = struct{}{}
+		}
+	}
+
+	return VideoInfo{
+		Title:         raw.Title,
+		Thumbnail:     raw.Thumbnail,
+		Resolutions:   mapToSortedStrings(resMap, "p"),
+		AudioBitrates: mapToSortedStrings(audioMap, "kbps"),
+	}, nil
+}
+
+func mapToSortedStrings(m map[int]struct{}, suffix string) []string {
+	keys := make([]int, 0, len(m))
+	for k := range m {
+		keys = append(keys, k)
+	}
+
+	sort.Ints(keys)
+
+	result := make([]string, 0, len(keys))
+	for _, k := range keys {
+		result = append(result, fmt.Sprintf("%d%s", k, suffix))
+	}
+
+	return result
 }
 
 func (y *YtDlp) Download(url string) (string, error) {

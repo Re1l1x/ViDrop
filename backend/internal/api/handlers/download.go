@@ -33,8 +33,10 @@ func (h *DownloadHandler) GetInfo(w http.ResponseWriter, r *http.Request) {
     }
 
     res := dto.InfoResponse{
-        Title:     info.Title,
-        Thumbnail: info.Thumbnail,
+        Title:           info.Title,
+        Thumbnail:       info.Thumbnail,
+        Resolutions:     info.Resolutions,
+        AudioBitrates:   info.AudioBitrates,
     }
 
     w.Header().Set("Content-Type", "application/json")
