@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
-import { Montserrat } from "next/font/google";
+import { Montserrat, Audiowide } from "next/font/google";
 import "./globals.css";
 
 const montserrat = Montserrat({ subsets: ["latin"] });
+const audiowide = Audiowide({ weight: "400", subsets: ["latin"] });
 
 export const metadata: Metadata = {
     title: "ViDrop",
