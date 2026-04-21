@@ -1,12 +1,11 @@
 package yt
 
 import (
-    "fmt"
-	"strings"
+	"encoding/json"
 	"os/exec"
-    "encoding/json"
 	"path/filepath"
-    "sort"
+	"sort"
+	"strings"
 )
 
 type YtDlp struct {
@@ -18,10 +17,10 @@ func New(outputDir string) *YtDlp {
 }
 
 type VideoInfo struct {
-	Title          string   `json:"title"`
+	Title          string  	`json:"title"`
 	Thumbnail      string   `json:"thumbnail"`
-	Resolutions    []string `json:"resolutions"`
-	AudioBitrates  []string `json:"audio_bitrates"`
+	Resolutions    []int 	`json:"resolutions"`
+	AudioBitrates  []int 	`json:"audio_bitrates"`
 }
 
 type ytResponse struct {
@@ -63,28 +62,25 @@ func (y *YtDlp) GetInfo(url string) (VideoInfo, error) {
 		}
 	}
 
+	resolutions := make([]int, 0, len(resMap))
+	audioBitrates := make([]int, 0, len(audioMap))
+
+	for r := range resMap {
+		resolutions = append(resolutions, r)
+	}
+	for a := range audioMap {
+		audioBitrates = append(audioBitrates, a)
+	}
+
+	sort.Ints(resolutions)
+	sort.Ints(audioBitrates)
+
 	return VideoInfo{
 		Title:         raw.Title,
 		Thumbnail:     raw.Thumbnail,
-		Resolutions:   mapToSortedStrings(resMap, "p"),
-		AudioBitrates: mapToSortedStrings(audioMap, "kbps"),
+		Resolutions:   resolutions,
+		AudioBitrates: audioBitrates,
 	}, nil
-}
-
-func mapToSortedStrings(m map[int]struct{}, suffix string) []string {
-	keys := make([]int, 0, len(m))
-	for k := range m {
-		keys = append(keys, k)
-	}
-
-	sort.Ints(keys)
-
-	result := make([]string, 0, len(keys))
-	for _, k := range keys {
-		result = append(result, fmt.Sprintf("%d%s", k, suffix))
-	}
-
-	return result
 }
 
 func (y *YtDlp) Download(url string) (string, error) {
