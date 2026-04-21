@@ -1,81 +1,81 @@
 package handlers
 
 import (
-    "strings"
-    "encoding/json"
-    "net/http"
+	"encoding/json"
+	"net/http"
+	"strings"
 
-    "ViDrop/internal/api/handlers/dto"
-    "ViDrop/internal/service"
+	"ViDrop/internal/api/handlers/dto"
+	"ViDrop/internal/service"
 )
 
 type DownloadHandler struct {
-    downloader *service.Downloader
+	downloader *service.Downloader
 }
 
 func NewDownloadHandler(d *service.Downloader) *DownloadHandler {
-    return &DownloadHandler{downloader: d}
+	return &DownloadHandler{downloader: d}
 }
 
 func (h *DownloadHandler) GetInfo(w http.ResponseWriter, r *http.Request) {
-    var req dto.InfoRequest
+	var req dto.InfoRequest
 
-    err := json.NewDecoder(r.Body).Decode(&req)
-    if err != nil {
-        http.Error(w, "invalid request", http.StatusBadRequest)
-        return
-    }
+	err := json.NewDecoder(r.Body).Decode(&req)
+	if err != nil {
+		http.Error(w, "invalid request", http.StatusBadRequest)
+		return
+	}
 
-    info, err := h.downloader.GetInfo(req.URL)
-    if err != nil {
-        http.Error(w, err.Error(), http.StatusInternalServerError)
-        return
-    }
+	info, err := h.downloader.GetInfo(req.URL)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 
-    res := dto.InfoResponse{
-        Title:           info.Title,
-        Thumbnail:       info.Thumbnail,
-        Resolutions:     info.Resolutions,
-        AudioBitrates:   info.AudioBitrates,
-    }
+	res := dto.InfoResponse{
+		Title:         info.Title,
+		Thumbnail:     info.Thumbnail,
+		Resolutions:   info.Resolutions,
+		AudioBitrates: info.AudioBitrates,
+	}
 
-    w.Header().Set("Content-Type", "application/json")
-    json.NewEncoder(w).Encode(res)
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(res)
 }
 
 func (h *DownloadHandler) Download(w http.ResponseWriter, r *http.Request) {
-    var req dto.DownloadRequest
+	var req dto.DownloadRequest
 
-    err := json.NewDecoder(r.Body).Decode(&req)
-    if err != nil {
-        http.Error(w, "invalid request", http.StatusBadRequest)
-        return
-    }
+	err := json.NewDecoder(r.Body).Decode(&req)
+	if err != nil {
+		http.Error(w, "invalid request", http.StatusBadRequest)
+		return
+	}
 
-    fileID, err := h.downloader.Download(req.URL)
-    if err != nil {
-        http.Error(w, err.Error(), http.StatusInternalServerError)
-        return
-    }
+	fileID, err := h.downloader.Download(req.URL)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 
-    res := dto.DownloadResponse{
-        FileID:      fileID,
-        DownloadURL: "/file/" + fileID,
-    }
+	res := dto.DownloadResponse{
+		FileID:      fileID,
+		DownloadURL: "/file/" + fileID,
+	}
 
-    w.Header().Set("Content-Type", "application/json")
-    json.NewEncoder(w).Encode(res)
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(res)
 }
 
 func (h *DownloadHandler) GetFile(w http.ResponseWriter, r *http.Request) {
-    fileID := strings.TrimPrefix(r.URL.Path, "/file/")
+	fileID := strings.TrimPrefix(r.URL.Path, "/file/")
 
-    path, err := h.downloader.GetFilePath(fileID)
-    if err != nil {
-        http.Error(w, "file not found", http.StatusNotFound)
-        return
-    }
+	path, err := h.downloader.GetFilePath(fileID)
+	if err != nil {
+		http.Error(w, "file not found", http.StatusNotFound)
+		return
+	}
 
-    w.Header().Set("Content-Disposition", "attachment; filename=\""+fileID+"\"")
-    http.ServeFile(w, r, path)
+	w.Header().Set("Content-Disposition", "attachment; filename=\""+fileID+"\"")
+	http.ServeFile(w, r, path)
 }

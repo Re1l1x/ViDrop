@@ -17,18 +17,18 @@ import (
 func main() {
 	cfg := config.New()
 
-    ytClient := yt.New(cfg.TempDir)
-    store := storage.NewLocalStorage(cfg.DownloadDir)
+	ytClient := yt.New(cfg.TempDir)
+	store := storage.NewLocalStorage(cfg.DownloadDir)
 
-    downloader := service.NewDownloader(ytClient, store)
-    handler := handlers.NewDownloadHandler(downloader)
+	downloader := service.NewDownloader(ytClient, store)
+	handler := handlers.NewDownloadHandler(downloader)
 
-    mux := http.NewServeMux()
-    api.RegisterRoutes(mux, handler)
+	mux := http.NewServeMux()
+	api.RegisterRoutes(mux, handler)
 
-    log.Println("Server running on http://localhost:8080")
+	log.Println("Server running on http://localhost:8080")
 
-    server := &http.Server{
+	server := &http.Server{
 		Addr:         ":8080",
 		Handler:      middleware.Middleware(mux),
 		ReadTimeout:  15 * time.Second,
@@ -36,5 +36,5 @@ func main() {
 		IdleTimeout:  60 * time.Second,
 	}
 
-    log.Fatal(server.ListenAndServe())
+	log.Fatal(server.ListenAndServe())
 }

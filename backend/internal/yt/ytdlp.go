@@ -17,10 +17,10 @@ func New(outputDir string) *YtDlp {
 }
 
 type VideoInfo struct {
-	Title          string  	`json:"title"`
-	Thumbnail      string   `json:"thumbnail"`
-	Resolutions    []int 	`json:"resolutions"`
-	AudioBitrates  []int 	`json:"audio_bitrates"`
+	Title         string `json:"title"`
+	Thumbnail     string `json:"thumbnail"`
+	Resolutions   []int  `json:"resolutions"`
+	AudioBitrates []int  `json:"audio_bitrates"`
 }
 
 type ytResponse struct {
@@ -95,16 +95,16 @@ func (y *YtDlp) Download(url string) (string, error) {
 	outputTemplate := filepath.Join(y.outputDir, videoID+".mp4")
 
 	cmd := exec.Command(
-        "yt-dlp",
-        "-o", outputTemplate,
-        "--merge-output-format", "mp4",
-        url,
-    )
+		"yt-dlp",
+		"-o", outputTemplate,
+		"--merge-output-format", "mp4",
+		url,
+	)
 
 	_, err = cmd.CombinedOutput()
-    if err != nil {
-        return "", err
-    }
+	if err != nil {
+		return "", err
+	}
 
 	filePath := filepath.Join(y.outputDir, videoID+".mp4")
 

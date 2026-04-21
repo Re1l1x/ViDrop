@@ -1,19 +1,19 @@
 package storage
 
 import (
-    "fmt"
-    "os"
-    "path/filepath"
+	"fmt"
+	"os"
+	"path/filepath"
 )
 
 type LocalStorage struct {
-    basePath string
+	basePath string
 }
 
 func NewLocalStorage(basePath string) *LocalStorage {
-    os.MkdirAll(basePath, 0755)
+	os.MkdirAll(basePath, 0755)
 
-    return &LocalStorage{basePath: basePath}
+	return &LocalStorage{basePath: basePath}
 }
 
 func (s *LocalStorage) Save(tempPath string) (string, error) {
@@ -30,16 +30,16 @@ func (s *LocalStorage) Save(tempPath string) (string, error) {
 }
 
 func (s *LocalStorage) Get(fileID string) (string, error) {
-    path := filepath.Join(s.basePath, fileID)
+	path := filepath.Join(s.basePath, fileID)
 
-    if _, err := os.Stat(path); err != nil {
-        return "", err
-    }
+	if _, err := os.Stat(path); err != nil {
+		return "", err
+	}
 
-    return path, nil
+	return path, nil
 }
 
 func (s *LocalStorage) Delete(fileID string) error {
-    path := filepath.Join(s.basePath, fileID)
-    return os.Remove(path)
+	path := filepath.Join(s.basePath, fileID)
+	return os.Remove(path)
 }
