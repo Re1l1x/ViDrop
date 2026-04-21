@@ -1,3 +1,7 @@
+html {
+    font-size: 62.5%;
+}
+
 .layout {
     display: flex;
     flex-direction: column;
@@ -11,74 +15,99 @@
 .container {
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: center;
+
+    width: 66.7vw;
 }
 
-.input_line_container {
+.header_container {
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
+
+    width: 100%;
 }
+
 .title {
-    margin: 5vh 0px;
+    margin: 5rem 0px;
 
     font-family: "audiowide";
-    font-size: 54pt;
+    font-size: 7rem;
 
     color: rgb(151, 147, 255);
 }
-.input_line_container input {
-    height: 10vh;
-    width: 60vw;
-    padding: 0px 40px;
+.title.urlSubmitted {
+    margin: 2rem 0px;
 
-    font-size: 24pt;
+    font-size: 5rem;
+
+    transition:
+        margin 0.3s ease-out,
+        font-size 0.3s ease-out;
+}
+
+.input_line {
+    height: 10rem;
+    width: 100%;
+    padding: 0px 4rem;
+
+    font-size: 3rem;
 
     background-color: rgb(43, 43, 49);
     border: rgb(100, 100, 100) solid 2px;
-    border-radius: 5vh;
+    border-radius: 5rem;
 }
+
 .section_name {
     font-family: "montserrat";
-    font-size: 24pt;
+    font-size: 2.3rem;
 
     color: rgb(190, 190, 190);
 }
+/* может заменить на просто .info_container посередине? */
+.divider {
+    height: 15%;
+    min-height: 5rem;
+    width: 100%;
+}
+
 .info_container {
     display: flex;
     flex-direction: row;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start;
 
-    height: 55vh;
-    width: 75vw;
-    margin: 10vh 0px 0px 0px;
-}
-
-.info_container.expanded {
-    animation: expandContainer 0.3s ease-out forwards;
-}
-.info_container.collapsed {
-    height: 0vh;
-    width: 0vw;
+    max-height: 0px;
+    width: 0px;
+    gap: 5%;
 
     overflow: hidden;
 }
-@keyframes expandContainer {
+.info_container.urlSubmitted {
+    width: 100%;
+
+    animation: expandInfoContainer 0.3s ease-out forwards;
+
+    overflow: hidden;
+}
+
+@keyframes expandInfoContainer {
     0% {
-        height: 0vh;
+        max-height: 0px;
 
         opacity: 0;
+
+        transform: translateY(20rem);
     }
-    50% {
-        opacity: 0;
-    }
+
     100% {
-        height: 55vh;
+        max-height: 100vh;
 
         opacity: 1;
+
+        transform: translateY(0px);
     }
 }
 
@@ -106,25 +135,28 @@
 } */
 .video_container {
     flex-direction: column;
+
+    width: 40%;
 }
 .video_container img {
-    width: 35vw;
-    padding: 0px 0px 20px 0px;
+    width: 100%;
 
     aspect-ratio: 16/9;
 }
 .video_name {
-    width: 35vw;
+    width: 100%;
+    padding: 2rem 0px 0px 0px;
 
     font-family: "montserrat";
-    font-size: 24pt;
+    font-size: 2.3rem;
 }
+
 .control_container {
     display: flex;
     flex-direction: column;
 
-    width: 35vw;
-    gap: 20px;
+    width: 55%;
+    gap: 2rem;
 
     /* grid-template-columns: 1fr 1fr; */
 }
@@ -136,57 +168,34 @@
 
     gap: 20px;
 }
-.button_control {
+.control_button {
     flex: 1 1 0;
 
-    height: 7vh;
+    height: 5rem;
 
     font-family: "montserrat";
-    font-size: 18pt;
+    font-size: 2.4rem;
 
     background-color: rgb(67, 67, 77);
     border: 0px;
-    border-radius: 3.5vh;
+    border-radius: 2.5vh;
 }
-.button_control:hover {
+.control_button:hover {
     background-color: rgb(47, 47, 52);
 }
-.button_download {
-    flex: 1;
 
-    height: 7vh;
-
-    font-family: "montserrat";
-    font-size: 18pt;
-
-    color: black;
-    background-color: white;
-    border: 0px;
-    border-radius: 3.5vh;
-
-    grid-column-start: 1;
-    grid-column-end: 3;
-}
-.button_download:hover {
-    color: white;
-    background-color: black;
-    border: rgb(190, 190, 190) solid 2px;
-    box-shadow:
-        0px 0px 15px 0px rgb(255, 255, 255),
-        inset 0px 0px 3px 0px rgb(255, 255, 255);
-}
 .quality_selector {
     text-align: center;
 
-    height: 7vh;
+    height: 5rem;
     width: auto;
 
     font-family: "montserrat";
-    font-size: 18pt;
+    font-size: 2.4rem;
 
     background-color: rgb(67, 67, 77);
     border: 0px;
-    border-radius: 3.5vh;
+    border-radius: 2.5rem;
 }
 .quality_selector option {
     color: white;
@@ -194,4 +203,28 @@
 }
 .quality_selector option[disabled] {
     display: none;
+}
+.download_button {
+    flex: 1;
+
+    height: 5rem;
+
+    font-family: "montserrat";
+    font-size: 2.4rem;
+
+    color: black;
+    background-color: white;
+    border: 0px;
+    border-radius: 2.5rem;
+
+    grid-column-start: 1;
+    grid-column-end: 3;
+}
+.download_button:hover {
+    color: white;
+    background-color: black;
+    border: rgb(190, 190, 190) solid 2px;
+    box-shadow:
+        0px 0px 15px 0px rgb(255, 255, 255),
+        inset 0px 0px 3px 0px rgb(255, 255, 255);
 }

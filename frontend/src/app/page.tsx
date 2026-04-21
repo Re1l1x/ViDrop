@@ -1,6 +1,6 @@
 "use client";
 
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, useState, useRef } from "react";
 import styles from "./page.module.css";
 
 export default function Home() {
@@ -9,6 +9,8 @@ export default function Home() {
 
     const [isUrlEntered, setIsUrlEntered] = useState<boolean>(false);
     const targetLength = 43;
+
+    const containerRef = useRef<HTMLDivElement>(null);
 
     async function Download() {
         try {
@@ -40,22 +42,51 @@ export default function Home() {
         setInputUrl(input);
         if (input.length >= targetLength) {
             setIsUrlEntered(true);
+            expandContainer();
         }
     };
+    function expandContainer() {
+        const el = containerRef.current;
+        if (!el) return;
+
+        const start = el.scrollHeight;
+        const end = window.innerHeight;
+
+        document.body.style.overflow = "hidden";
+
+        el.style.height = start + "px";
+        // console.log("start: " + start + " end: " + end);
+
+        // почему без этого не работает?
+        requestAnimationFrame(() => {
+            el.style.transition = "height 0.3s ease";
+            el.style.height = end + "px";
+        });
+
+        const onEnd = (e: TransitionEvent) => {
+            if (e.propertyName !== "height") return;
+
+            document.body.style.overflow = "";
+            el.removeEventListener("transitionend", onEnd);
+        };
+
+        el.addEventListener("transitionend", onEnd);
+    }
 
     return (
         <div className={styles.layout}>
-            <div className={styles.container}>
-                <div className={styles.input_line_container}>
-                    <div className={styles.title}>ViDrop</div>
-                    <input onChange={onChangeUrl} type="text" placeholder="Paste Your URL..."></input>
+            <div ref={containerRef} className={styles.container}>
+                {/* <div className={`${styles.container} ${isUrlEntered ? styles.toUp : ""}`}> */}
+                <div className={styles.header_container}>
+                    <div className={`${styles.title} ${isUrlEntered ? styles.urlSubmitted : ""}`}>ViDrop</div>
+                    <input className={styles.input_line} onChange={onChangeUrl} type="text" placeholder="Paste Your URL..."></input>
                 </div>
-
-                <div className={`${styles.info_container} ${isUrlEntered ? styles.expanded : styles.collapsed}`}>
+                <div className={styles.divider}></div>
+                <div className={`${styles.info_container} ${isUrlEntered ? styles.urlSubmitted : ""}`}>
                     {/* <div className={`${styles.form_box} ${isSignIn ? "" : styles.active}`}></div> */}
                     <div className={styles.video_container}>
-                        {/* <div className={styles.section_name}>Video</div> */}
-                        <img src={"favicon.ico"} alt="Video Preview" />
+                        <div className={styles.section_name}>Video</div>
+                        <img src={"preview final.jpg"} alt="Video Preview" />
                         <div className={styles.video_name}>Дыо против Жотары. Кабачковое противостояние</div>
                     </div>
                     <div className={styles.control_container}>
@@ -63,10 +94,10 @@ export default function Home() {
                             <div className={styles.section_name}>Settings:</div>
                         </div>
                         <div className={styles.control_row}>
-                            <button className={styles.button_control} onClick={Download}>
+                            <button className={styles.control_button} onClick={Download}>
                                 Video
                             </button>
-                            <button className={styles.button_control}>Audio</button>
+                            <button className={styles.control_button}>Audio</button>
                         </div>
                         <div className={styles.control_row}>
                             <div className={styles.section_name}>Quality:</div>
@@ -83,7 +114,7 @@ export default function Home() {
                             </select>
                         </div>
                         <div className={styles.control_row}>
-                            <button className={styles.button_download} onClick={getVideo}>
+                            <button className={styles.download_button} onClick={getVideo}>
                                 Download
                             </button>
                         </div>
