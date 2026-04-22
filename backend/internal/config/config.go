@@ -14,7 +14,7 @@ func New() *Config {
 	wd, _ := os.Getwd()
 
 	return &Config{
-		TempDir:     filepath.Join(wd, "temp"),
-		DownloadDir: filepath.Join(wd, "downloads"),
+		TempDir:     filepath.Join(wd, "storage/temp"),
+		DownloadDir: filepath.Join(wd, "storage/media"),
 	}
 }
