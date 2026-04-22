@@ -2,6 +2,7 @@ package yt
 
 import (
 	"encoding/json"
+	"fmt"
 	"os/exec"
 	"path/filepath"
 	"sort"
@@ -83,7 +84,7 @@ func (y *YtDlp) GetInfo(url string) (VideoInfo, error) {
 	}, nil
 }
 
-func (y *YtDlp) Download(url string) (string, error) {
+func (y *YtDlp) Download(url string, resolution int, audioBitrate int) (string, error) {
 	cmdID := exec.Command("yt-dlp", "--print", "id", url)
 	idOut, err := cmdID.Output()
 	if err != nil {
@@ -92,10 +93,17 @@ func (y *YtDlp) Download(url string) (string, error) {
 
 	videoID := strings.TrimSpace(string(idOut))
 
+	format := fmt.Sprintf(
+		"bestvideo[height<=%d]+bestaudio[abr<=%d]/best",
+		resolution,
+		audioBitrate+1,
+	)
+
 	outputTemplate := filepath.Join(y.outputDir, videoID+".mp4")
 
 	cmd := exec.Command(
 		"yt-dlp",
+		"-f", format,
 		"-o", outputTemplate,
 		"--merge-output-format", "mp4",
 		url,

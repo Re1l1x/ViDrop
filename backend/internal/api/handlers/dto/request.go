@@ -5,5 +5,7 @@ type InfoRequest struct {
 }
 
 type DownloadRequest struct {
-	URL string `json:"url"`
+	URL          string `json:"url"`
+	Resolution   int    `json:"resolution"`
+	AudioBitrate int    `json:"audio_bitrate"`
 }

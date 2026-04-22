@@ -23,8 +23,8 @@ func (d *Downloader) GetInfo(url string) (yt.VideoInfo, error) {
 	return d.yt.GetInfo(url)
 }
 
-func (d *Downloader) Download(url string) (string, error) {
-	filePath, err := d.yt.Download(url)
+func (d *Downloader) Download(url string, resolution int, audioBitrate int) (string, error) {
+	filePath, err := d.yt.Download(url, resolution, audioBitrate)
 	if err != nil {
 		return "", fmt.Errorf("download failed: %w", err)
 	}
