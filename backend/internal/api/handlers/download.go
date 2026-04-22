@@ -52,7 +52,7 @@ func (h *DownloadHandler) Download(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fileID, err := h.downloader.Download(req.URL, req.Resolution, req.AudioBitrate)
+	fileID, err := h.downloader.Download(req.URL, req.Resolution, req.AudioBitrate, req.Format)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
