@@ -16,9 +16,7 @@ func NewLocalStorage(basePath string) *LocalStorage {
 	return &LocalStorage{basePath: basePath}
 }
 
-func (s *LocalStorage) Save(tempPath string) (string, error) {
-	fileName := filepath.Base(tempPath)
-
+func (s *LocalStorage) Save(tempPath string, fileName string) (string, error) {
 	destPath := filepath.Join(s.basePath, fileName)
 
 	err := os.Rename(tempPath, destPath)

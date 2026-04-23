@@ -1,6 +1,8 @@
 package service
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"fmt"
 
 	"ViDrop/internal/storage"
@@ -24,17 +26,32 @@ func (d *Downloader) GetInfo(url string) (yt.VideoInfo, error) {
 }
 
 func (d *Downloader) Download(url string, resolution int, audioBitrate int, format string) (string, error) {
-	filePath, err := d.yt.Download(url, resolution, audioBitrate, format)
+	videoID, err := d.yt.GetVideoID(url)
+	if err != nil {
+		return "", err
+	}
+
+	fileID := generateFileID(videoID, resolution, audioBitrate, format)
+	fileName := fileID + "." + format
+
+	tempPath, err := d.yt.Download(url, resolution, audioBitrate, format, fileName)
 	if err != nil {
 		return "", fmt.Errorf("download failed: %w", err)
 	}
 
-	fileID, err := d.storage.Save(filePath)
+	_, err = d.storage.Save(tempPath, fileName)
 	if err != nil {
 		return "", fmt.Errorf("save failed: %w", err)
 	}
 
 	return fileID, nil
+}
+
+func generateFileID(videoID string, resolution int, audioBitrate int, format string) string {
+	raw := fmt.Sprintf("%s|%d|%d|%s", videoID, resolution, audioBitrate, format)
+
+	hash := sha256.Sum256([]byte(raw))
+	return hex.EncodeToString(hash[:])[:16]
 }
 
 func (d *Downloader) GetFilePath(fileID string) (string, error) {

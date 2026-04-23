@@ -84,37 +84,38 @@ func (y *YtDlp) GetInfo(url string) (VideoInfo, error) {
 	}, nil
 }
 
-func (y *YtDlp) Download(url string, resolution int, audioBitrate int, format string) (string, error) {
-	cmdID := exec.Command("yt-dlp", "--print", "id", url)
-	idOut, err := cmdID.Output()
+func (y *YtDlp) GetVideoID(url string) (string, error) {
+	cmd := exec.Command("yt-dlp", "--print", "id", url)
+
+	id, err := cmd.Output()
 	if err != nil {
 		return "", err
 	}
 
-	videoID := strings.TrimSpace(string(idOut))
+	return strings.TrimSpace(string(id)), nil
+}
 
+func (y *YtDlp) Download(url string, resolution int, audioBitrate int, format string, fileName string) (string, error) {
 	formatSelector := fmt.Sprintf(
 		"bestvideo[height<=%d]+bestaudio[abr<=%d]/best",
 		resolution,
 		audioBitrate+1,
 	)
 
-	outputTemplate := filepath.Join(y.outputDir, videoID+"."+format)
+	outputPath := filepath.Join(y.outputDir, fileName)
 
 	cmd := exec.Command(
 		"yt-dlp",
 		"-f", formatSelector,
-		"-o", outputTemplate,
+		"-o", outputPath,
 		"--merge-output-format", format,
 		url,
 	)
 
-	_, err = cmd.CombinedOutput()
+	_, err := cmd.CombinedOutput()
 	if err != nil {
 		return "", err
 	}
 
-	filePath := filepath.Join(y.outputDir, videoID+"."+format)
-
-	return filePath, nil
+	return outputPath, nil
 }
