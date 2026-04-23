@@ -3,11 +3,11 @@ package api
 import (
 	"net/http"
 
-	"ViDrop/internal/api/handlers"
+	"ViDrop/internal/api/handler"
 )
 
-func RegisterRoutes(mux *http.ServeMux, downloadHandler *handlers.DownloadHandler) {
-	mux.HandleFunc("/info", downloadHandler.GetInfo)
-	mux.HandleFunc("/download", downloadHandler.Download)
-	mux.HandleFunc("/file/", downloadHandler.GetFile)
+func RegisterRoutes(mux *http.ServeMux, handler *handler.Handler) {
+	mux.HandleFunc("/info", handler.GetVideoInfo)
+	mux.HandleFunc("/download", handler.Download)
+	mux.HandleFunc("/file/", handler.GetFile)
 }
