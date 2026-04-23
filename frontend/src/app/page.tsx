@@ -11,6 +11,12 @@ export default function Home() {
     const targetLength = 43;
 
     const containerRef = useRef<HTMLDivElement>(null);
+    const [videoInfo, setVideoInfo] = useState<{
+        title: string;
+        thumbnail_url: string;
+        resolutions: number[];
+        bitrates: number[];
+    } | null>(null);
 
     async function Download() {
         try {
@@ -43,6 +49,7 @@ export default function Home() {
         if (input.length >= targetLength) {
             setIsUrlEntered(true);
             expandContainer();
+            //getVideoInfo();
         }
     };
     function expandContainer() {
@@ -67,56 +74,98 @@ export default function Home() {
             if (e.propertyName !== "height") return;
 
             document.body.style.overflow = "";
+            el.style.height = "100vh";
+            el.style.transition = "";
             el.removeEventListener("transitionend", onEnd);
         };
 
         el.addEventListener("transitionend", onEnd);
     }
 
+    async function getVideoInfo() {
+        fetch("http://localhost:8080/info", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                url: inputUrl,
+            }),
+        })
+            .then((response) => {
+                return response.json();
+            })
+            .then((data) => {
+                setVideoInfo(data);
+            })
+            .catch((error) => {
+                const e = error as Error;
+                console.error(e.message);
+            });
+    }
+    // try {
+    //     const response = await fetch("http://localhost:8080/info", {
+    //         method: "POST",
+    //         headers: {
+    //             "Content-Type": "application/json",
+    //         },
+    //         body: JSON.stringify({
+    //             url: inputUrl,
+    //         }),
+    //     });
+
+    //     const result = await response.json();
+
+    // } catch (error) {
+    //     const e = error as Error;
+    //     console.error(e.message);
+    // }
+
     return (
         <div className={styles.layout}>
             <div ref={containerRef} className={styles.container}>
-                {/* <div className={`${styles.container} ${isUrlEntered ? styles.toUp : ""}`}> */}
                 <div className={styles.header_container}>
                     <div className={`${styles.title} ${isUrlEntered ? styles.urlSubmitted : ""}`}>ViDrop</div>
                     <input className={styles.input_line} onChange={onChangeUrl} type="text" placeholder="Paste Your URL..."></input>
                 </div>
-                <div className={styles.divider}></div>
-                <div className={`${styles.info_container} ${isUrlEntered ? styles.urlSubmitted : ""}`}>
-                    {/* <div className={`${styles.form_box} ${isSignIn ? "" : styles.active}`}></div> */}
-                    <div className={styles.video_container}>
-                        <div className={styles.section_name}>Video</div>
-                        <img src={"preview final.jpg"} alt="Video Preview" />
-                        <div className={styles.video_name}>Дыо против Жотары. Кабачковое противостояние</div>
-                    </div>
-                    <div className={styles.control_container}>
-                        <div className={styles.control_row}>
-                            <div className={styles.section_name}>Settings:</div>
+                {/* <div className={styles.divider}></div> */}
+                <div className={`${styles.main_page} ${isUrlEntered ? styles.urlSubmitted : ""}`}>
+                    <div className={styles.info_container}>
+                        <div className={styles.video_container}>
+                            <div className={styles.section_name}>Video</div>
+
+                            <img src={videoInfo?.thumbnail_url} alt={videoInfo?.title} />
+                            <div className={styles.video_name}>{videoInfo?.title}</div>
                         </div>
-                        <div className={styles.control_row}>
-                            <button className={styles.control_button} onClick={Download}>
-                                Video
-                            </button>
-                            <button className={styles.control_button}>Audio</button>
-                        </div>
-                        <div className={styles.control_row}>
-                            <div className={styles.section_name}>Quality:</div>
-                            <select className={styles.quality_selector} name="Quality">
-                                <option value="" disabled selected>
-                                    Select Quality
-                                </option>
-                                <option value="">144p</option>
-                                <option value="">240p</option>
-                                <option value="">360p</option>
-                                <option value="">480p</option>
-                                <option value="">720p</option>
-                                <option value="">1080p</option>
-                            </select>
-                        </div>
-                        <div className={styles.control_row}>
-                            <button className={styles.download_button} onClick={getVideo}>
-                                Download
-                            </button>
+                        <div className={styles.control_container}>
+                            <div className={styles.control_row}>
+                                <div className={styles.section_name}>Settings:</div>
+                            </div>
+                            <div className={styles.control_row}>
+                                <button className={styles.control_button} onClick={Download}>
+                                    Video
+                                </button>
+                                <button className={styles.control_button}>Audio</button>
+                            </div>
+                            <div className={styles.control_row}>
+                                <div className={styles.section_name}>Quality:</div>
+                                <select className={styles.quality_selector} defaultValue="">
+                                    <option value="" disabled>
+                                        Select Quality
+                                    </option>
+
+                                    {videoInfo?.resolutions.map((res) => (
+                                        <option key={res} value={res}>
+                                            {res}p
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div className={styles.control_row}>
+                                <button className={styles.download_button} onClick={getVideo}>
+                                    Download
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
