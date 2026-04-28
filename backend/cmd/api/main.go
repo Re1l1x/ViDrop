@@ -8,6 +8,7 @@ import (
 	"ViDrop/internal/api"
 	"ViDrop/internal/api/handler"
 	"ViDrop/internal/config"
+	"ViDrop/internal/job"
 	"ViDrop/internal/middleware"
 	"ViDrop/internal/service"
 	"ViDrop/internal/storage"
@@ -21,7 +22,10 @@ func main() {
 	store := storage.NewLocalStorage(cfg.DownloadDir)
 
 	downloader := service.NewDownloader(ytClient, store)
-	handler := handler.NewHandler(downloader)
+	runner := job.NewRunner(downloader)
+	jobs := job.NewManager(runner)
+
+	handler := handler.NewHandler(downloader, jobs)
 
 	mux := http.NewServeMux()
 	api.RegisterRoutes(mux, handler)

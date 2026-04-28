@@ -25,13 +25,17 @@ func (d *Downloader) GetInfo(url string) (yt.VideoInfo, error) {
 	return d.yt.GetInfo(url)
 }
 
+func (d *Downloader) GetVideoID(url string) (string, error) {
+	return d.yt.GetVideoID(url)
+}
+
 func (d *Downloader) Download(url string, resolution int, audioBitrate int, format string) (string, error) {
 	videoID, err := d.yt.GetVideoID(url)
 	if err != nil {
 		return "", err
 	}
 
-	fileID := generateFileID(videoID, resolution, audioBitrate, format)
+	fileID := GenerateFileID(videoID, resolution, audioBitrate, format)
 	fileName := fileID + "." + format
 
 	tempPath, err := d.yt.Download(url, resolution, audioBitrate, format, fileName)
@@ -47,7 +51,7 @@ func (d *Downloader) Download(url string, resolution int, audioBitrate int, form
 	return fileID, nil
 }
 
-func generateFileID(videoID string, resolution int, audioBitrate int, format string) string {
+func GenerateFileID(videoID string, resolution int, audioBitrate int, format string) string {
 	raw := fmt.Sprintf("%s|%d|%d|%s", videoID, resolution, audioBitrate, format)
 
 	hash := sha256.Sum256([]byte(raw))
