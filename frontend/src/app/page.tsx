@@ -49,7 +49,7 @@ export default function Home() {
         if (input.length >= targetLength) {
             setIsUrlEntered(true);
             expandContainer();
-            //getVideoInfo();
+            getVideoInfo(input);
         }
     };
     function expandContainer() {
@@ -82,20 +82,22 @@ export default function Home() {
         el.addEventListener("transitionend", onEnd);
     }
 
-    async function getVideoInfo() {
+    async function getVideoInfo(input: string) {
         fetch("http://localhost:8080/info", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({
-                url: inputUrl,
+                url: input,
             }),
         })
             .then((response) => {
+                console.log(response);
                 return response.json();
             })
             .then((data) => {
+                console.log(data);
                 setVideoInfo(data);
             })
             .catch((error) => {
@@ -128,43 +130,64 @@ export default function Home() {
                     <div className={`${styles.title} ${isUrlEntered ? styles.urlSubmitted : ""}`}>ViDrop</div>
                     <input className={styles.input_line} onChange={onChangeUrl} type="text" placeholder="Paste Your URL..."></input>
                 </div>
-                {/* <div className={styles.divider}></div> */}
                 <div className={`${styles.main_page} ${isUrlEntered ? styles.urlSubmitted : ""}`}>
                     <div className={styles.info_container}>
                         <div className={styles.video_container}>
-                            <div className={styles.section_name}>Video</div>
-
                             <img src={videoInfo?.thumbnail_url} alt={videoInfo?.title} />
                             <div className={styles.video_name}>{videoInfo?.title}</div>
                         </div>
                         <div className={styles.control_container}>
                             <div className={styles.control_row}>
-                                <div className={styles.section_name}>Settings:</div>
+                                <div className={styles.section_name}>Video</div>
+                                <label className={styles.toggle_switch}>
+                                    <input type="checkbox"></input>
+                                    <span className={styles.move_switch}></span>
+                                </label>
                             </div>
                             <div className={styles.control_row}>
-                                <button className={styles.control_button} onClick={Download}>
-                                    Video
-                                </button>
-                                <button className={styles.control_button}>Audio</button>
-                            </div>
-                            <div className={styles.control_row}>
-                                <div className={styles.section_name}>Quality:</div>
                                 <select className={styles.quality_selector} defaultValue="">
-                                    <option value="" disabled>
-                                        Select Quality
-                                    </option>
+                                    {/* <option value="" disabled>
+                                        Select Video Quality
+                                    </option> */}
 
-                                    {videoInfo?.resolutions.map((res) => (
+                                    {videoInfo?.bitrates.map((res) => (
                                         <option key={res} value={res}>
                                             {res}p
                                         </option>
                                     ))}
                                 </select>
+                                {/* <button className={styles.control_button} onClick={Download}>
+                                    Video
+                                </button>
+                                <button className={styles.control_button}>Audio</button> */}
                             </div>
                             <div className={styles.control_row}>
+                                <div className={styles.section_name}>Audio</div>
+                                <label className={styles.toggle_switch}>
+                                    <input type="checkbox"></input>
+                                    <span className={styles.move_switch}></span>
+                                </label>
+                            </div>
+                            <div className={styles.control_row}>
+                                <select className={styles.quality_selector} defaultValue="">
+                                    {/* <option value="" disabled>
+                                        Select Audio Quality
+                                    </option> */}
+
+                                    {videoInfo?.resolutions.map((bps) => (
+                                        <option key={bps} value={bps}>
+                                            {bps}p
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div className={styles.download_extension_button}>
                                 <button className={styles.download_button} onClick={getVideo}>
                                     Download
                                 </button>
+                                <select className={styles.extension_button} defaultValue="">
+                                    <option> Prepfej </option>
+                                </select>
                             </div>
                         </div>
                     </div>

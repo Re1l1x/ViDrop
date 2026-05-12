@@ -2,7 +2,7 @@ html {
     font-size: 62.5%;
 }
 body {
-    background-color: rgb(25, 25, 29);
+    background-color: #101012;
 }
 
 .layout {
@@ -39,12 +39,12 @@ body {
     font-family: "audiowide";
     font-size: 8rem;
 
-    color: rgb(151, 147, 255);
+    color: #6661e9;
 }
 .title.urlSubmitted {
     margin: 3rem 0px;
 
-    font-size: 5rem;
+    font-size: 7rem;
 
     transition:
         margin 0.3s ease-out,
@@ -53,20 +53,21 @@ body {
 
 .input_line {
     height: 8rem;
-    width: 100%;
-    padding: 0px 3rem;
+    width: 80%;
+    padding: 0px 4rem;
 
-    font-size: 3rem;
+    font-size: 3.2rem;
 
-    color: rgb(190, 190, 190);
-    background-color: rgb(43, 43, 49);
-    border: rgb(80, 80, 80) solid 1px;
+    color: #cacaca;
+    background-color: #202027;
+    border: 0px;
     border-radius: 5rem;
 }
 
 .section_name {
     font-family: "montserrat";
-    font-size: 2.3rem;
+    font-size: 4rem;
+    font-weight: bold;
 
     color: rgb(190, 190, 190);
 }
@@ -123,15 +124,16 @@ body {
     justify-content: center;
     align-items: flex-start;
 
+    width: 100%;
     gap: 5%;
 }
 .video_container {
     flex-direction: column;
 
-    width: 40%;
+    width: 55%;
 }
 .video_container img {
-    width: 100%;
+    height: 100%;
 
     aspect-ratio: 16/9;
 }
@@ -141,25 +143,81 @@ body {
 
     font-family: "montserrat";
     font-size: 2.3rem;
+
+    color: #7f7f89;
 }
 
 .control_container {
     display: flex;
     flex-direction: column;
 
-    width: 55%;
+    width: 35%;
+    padding: 3rem;
     gap: 2rem;
+
+    background-color: #202027;
+    border: 0px;
+    border-radius: 30px;
 
     /* grid-template-columns: 1fr 1fr; */
 }
 .control_row {
     display: flex;
     flex: 1;
-    justify-content: space-between;
+    justify-content: flex-start;
     align-items: center;
 
     gap: 20px;
 }
+
+.toggle_switch {
+    position: relative;
+
+    display: inline-block;
+
+    height: 2.6rem;
+    width: 5.5rem;
+}
+.toggle_switch input {
+    height: 0;
+    width: 0;
+
+    opacity: 1;
+}
+.move_switch {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+
+    background-color: #30303a;
+    border: 0px;
+    border-radius: 1.25rem;
+
+    cursor: pointer;
+}
+.move_switch::before {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0.3rem;
+
+    height: 2rem;
+    width: 2rem;
+    margin: auto 0;
+
+    background-color: #6e69f5;
+    border-radius: 1rem;
+
+    transition: 0.3s;
+
+    content: "";
+}
+input:checked + .move_switch::before {
+    transform: translateX(2.9rem);
+}
+
 .control_button {
     flex: 1 1 0;
 
@@ -177,6 +235,8 @@ body {
 }
 
 .quality_selector {
+    display: flex;
+    flex: 1;
     text-align: center;
 
     height: 5rem;
@@ -185,12 +245,9 @@ body {
     font-family: "montserrat";
     font-size: 2.4rem;
 
-    background-color: rgb(67, 67, 77);
+    background-color: #30303a;
     border: 0px;
     border-radius: 2.5rem;
-}
-.quality_selector:hover {
-    background-color: rgb(47, 47, 52);
 }
 .quality_selector option {
     color: white;
@@ -199,29 +256,45 @@ body {
 .quality_selector option[disabled] {
     display: none;
 }
-.download_button {
-    flex: 1;
+.download_extension_button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
 
+    margin-top: 5%;
+    gap: 3px;
+}
+.download_button {
     height: 5rem;
+    padding: 1rem;
 
     font-family: "montserrat";
     font-size: 2.4rem;
 
-    color: black;
-    background-color: white;
+    color: white;
+    background-color: #4944cc;
     border: 0px;
-    border-radius: 2.5rem;
+    border-radius: 2.5rem 0rem 0rem 2.5rem;
 
     transition: all 0.1s linear;
 
     grid-column-start: 1;
     grid-column-end: 3;
 }
-.download_button:hover {
+.extension_button {
+    height: 5rem;
+    padding: 1rem;
+
+    font-family: "montserrat";
+    font-size: 2.4rem;
+
     color: white;
-    background-color: black;
-    border: rgb(190, 190, 190) solid 2px;
-    box-shadow:
-        0px 0px 15px 0px rgb(255, 255, 255),
-        inset 0px 0px 3px 0px rgb(255, 255, 255);
+    background-color: #4944cc;
+    border: 0px;
+    border-radius: 0rem 2.5rem 2.5rem 0rem;
+
+    transition: all 0.1s linear;
+
+    grid-column-start: 1;
+    grid-column-end: 3;
 }
