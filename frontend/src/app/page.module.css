@@ -105,7 +105,9 @@ body {
 
         transform: translateY(20rem);
     }
-
+    1% {
+        width: 100%;
+    }
     100% {
         max-height: 100vh;
         width: 100%;
@@ -168,54 +170,6 @@ body {
     align-items: center;
 
     gap: 20px;
-}
-
-.toggle_switch {
-    position: relative;
-
-    display: inline-block;
-
-    height: 2.6rem;
-    width: 5.5rem;
-}
-.toggle_switch input {
-    height: 0;
-    width: 0;
-
-    opacity: 1;
-}
-.move_switch {
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-
-    background-color: #30303a;
-    border: 0px;
-    border-radius: 1.25rem;
-
-    cursor: pointer;
-}
-.move_switch::before {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 0.3rem;
-
-    height: 2rem;
-    width: 2rem;
-    margin: auto 0;
-
-    background-color: #6e69f5;
-    border-radius: 1rem;
-
-    transition: 0.3s;
-
-    content: "";
-}
-input:checked + .move_switch::before {
-    transform: translateX(2.9rem);
 }
 
 .control_button {

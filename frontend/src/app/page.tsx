@@ -2,6 +2,7 @@
 
 import { ChangeEvent, useState, useRef } from "react";
 import styles from "./page.module.css";
+import ToggleSwitch from "@/components/ToggleSwitch/ToggleSwitch";
 
 export default function Home() {
     const [inputUrl, setInputUrl] = useState<string>("");
@@ -9,6 +10,9 @@ export default function Home() {
 
     const [isUrlEntered, setIsUrlEntered] = useState<boolean>(false);
     const targetLength = 43;
+
+    const [isVideoEnabled, setIsVideoEnabled] = useState(true);
+    const [isAudioEnabled, setIsAudioEnabled] = useState(true);
 
     const containerRef = useRef<HTMLDivElement>(null);
     const [videoInfo, setVideoInfo] = useState<{
@@ -139,10 +143,7 @@ export default function Home() {
                         <div className={styles.control_container}>
                             <div className={styles.control_row}>
                                 <div className={styles.section_name}>Video</div>
-                                <label className={styles.toggle_switch}>
-                                    <input type="checkbox"></input>
-                                    <span className={styles.move_switch}></span>
-                                </label>
+                                <ToggleSwitch checked={isAudioEnabled} onChange={() => setIsAudioEnabled(!isAudioEnabled)} />
                             </div>
                             <div className={styles.control_row}>
                                 <select className={styles.quality_selector} defaultValue="">
@@ -163,10 +164,7 @@ export default function Home() {
                             </div>
                             <div className={styles.control_row}>
                                 <div className={styles.section_name}>Audio</div>
-                                <label className={styles.toggle_switch}>
-                                    <input type="checkbox"></input>
-                                    <span className={styles.move_switch}></span>
-                                </label>
+                                <ToggleSwitch checked={isVideoEnabled} onChange={() => setIsVideoEnabled(!isVideoEnabled)} />
                             </div>
                             <div className={styles.control_row}>
                                 <select className={styles.quality_selector} defaultValue="">
