@@ -66,9 +66,6 @@ export default function Home() {
         document.body.style.overflow = "hidden";
 
         el.style.height = start + "px";
-        // console.log("start: " + start + " end: " + end);
-
-        // почему без этого не работает?
         requestAnimationFrame(() => {
             el.style.transition = "height 0.3s ease";
             el.style.height = end + "px";
@@ -121,7 +118,6 @@ export default function Home() {
     //     });
 
     //     const result = await response.json();
-
     // } catch (error) {
     //     const e = error as Error;
     //     console.error(e.message);
@@ -143,17 +139,13 @@ export default function Home() {
                         <div className={styles.control_container}>
                             <div className={styles.control_row}>
                                 <div className={styles.section_name}>Video</div>
-                                <ToggleSwitch checked={isAudioEnabled} onChange={() => setIsAudioEnabled(!isAudioEnabled)} />
+                                <ToggleSwitch checked={isVideoEnabled} onChange={() => setIsVideoEnabled(!isVideoEnabled)} />
                             </div>
                             <div className={styles.control_row}>
                                 <select className={styles.quality_selector} defaultValue="">
-                                    {/* <option value="" disabled>
-                                        Select Video Quality
-                                    </option> */}
-
-                                    {videoInfo?.bitrates.map((res) => (
-                                        <option key={res} value={res}>
-                                            {res}p
+                                    {videoInfo?.bitrates.map((bitrate) => (
+                                        <option key={bitrate} value={bitrate}>
+                                            {bitrate}p
                                         </option>
                                     ))}
                                 </select>
@@ -164,17 +156,13 @@ export default function Home() {
                             </div>
                             <div className={styles.control_row}>
                                 <div className={styles.section_name}>Audio</div>
-                                <ToggleSwitch checked={isVideoEnabled} onChange={() => setIsVideoEnabled(!isVideoEnabled)} />
+                                <ToggleSwitch checked={isAudioEnabled} onChange={() => setIsAudioEnabled(!isAudioEnabled)} />
                             </div>
                             <div className={styles.control_row}>
                                 <select className={styles.quality_selector} defaultValue="">
-                                    {/* <option value="" disabled>
-                                        Select Audio Quality
-                                    </option> */}
-
-                                    {videoInfo?.resolutions.map((bps) => (
-                                        <option key={bps} value={bps}>
-                                            {bps}p
+                                    {videoInfo?.resolutions.map((resolution) => (
+                                        <option key={resolution} value={resolution}>
+                                            {resolution}p
                                         </option>
                                     ))}
                                 </select>
