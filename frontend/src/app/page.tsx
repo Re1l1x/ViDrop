@@ -3,6 +3,7 @@
 import { ChangeEvent, useState, useRef } from "react";
 import styles from "./page.module.css";
 import ToggleSwitch from "@/components/ToggleSwitch/ToggleSwitch";
+import Dropdown from "@/components/Dropdown/Dropdown";
 
 export default function Home() {
     const [inputUrl, setInputUrl] = useState<string>("");
@@ -84,6 +85,7 @@ export default function Home() {
     }
 
     async function getVideoInfo(input: string) {
+        console.log("Getting video info for URL:", input);
         fetch("http://localhost:8080/info", {
             method: "POST",
             headers: {
@@ -94,6 +96,9 @@ export default function Home() {
             }),
         })
             .then((response) => {
+                if (!response.ok) {
+                    throw new Error(`Response status: ${response.status}`);
+                }
                 console.log(response);
                 return response.json();
             })
@@ -142,17 +147,14 @@ export default function Home() {
                                 <ToggleSwitch checked={isVideoEnabled} onChange={() => setIsVideoEnabled(!isVideoEnabled)} />
                             </div>
                             <div className={styles.control_row}>
-                                <select className={styles.quality_selector} defaultValue="">
+                                {/* <select className={styles.quality_selector} defaultValue="">
                                     {videoInfo?.bitrates.map((bitrate) => (
                                         <option key={bitrate} value={bitrate}>
                                             {bitrate}p
                                         </option>
                                     ))}
-                                </select>
-                                {/* <button className={styles.control_button} onClick={Download}>
-                                    Video
-                                </button>
-                                <button className={styles.control_button}>Audio</button> */}
+                                </select> */}
+                                <Dropdown options={[10, 20, 30]} />
                             </div>
                             <div className={styles.control_row}>
                                 <div className={styles.section_name}>Audio</div>

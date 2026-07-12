@@ -71,7 +71,6 @@ body {
 
     color: rgb(190, 190, 190);
 }
-/* может заменить на просто .info_container посередине? */
 .divider {
     height: 15%;
     min-height: 5rem;
@@ -153,15 +152,13 @@ body {
     display: flex;
     flex-direction: column;
 
-    width: 35%;
+    width: 25%;
     padding: 3rem;
     gap: 2rem;
 
     background-color: #202027;
     border: 0px;
     border-radius: 30px;
-
-    /* grid-template-columns: 1fr 1fr; */
 }
 .control_row {
     display: flex;
@@ -212,6 +209,7 @@ body {
 }
 .download_extension_button {
     display: flex;
+    flex: 1;
     justify-content: center;
     align-items: center;
 
@@ -219,6 +217,10 @@ body {
     gap: 3px;
 }
 .download_button {
+    display: flex;
+    flex: 2;
+    justify-content: center;
+
     height: 5rem;
     padding: 1rem;
 
@@ -232,10 +234,15 @@ body {
 
     transition: all 0.1s linear;
 
-    grid-column-start: 1;
-    grid-column-end: 3;
+    /* grid-column-start: 1;
+    grid-column-end: 3; */
 }
 .extension_button {
+    display: flex;
+    flex: 1;
+    justify-content: center;
+    text-align: center;
+
     height: 5rem;
     padding: 1rem;
 
@@ -249,6 +256,6 @@ body {
 
     transition: all 0.1s linear;
 
-    grid-column-start: 1;
-    grid-column-end: 3;
+    /* grid-column-start: 1;
+    grid-column-end: 3; */
 }
