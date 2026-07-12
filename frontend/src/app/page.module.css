@@ -233,9 +233,6 @@ body {
     border-radius: 2.5rem 0rem 0rem 2.5rem;
 
     transition: all 0.1s linear;
-
-    /* grid-column-start: 1;
-    grid-column-end: 3; */
 }
 .extension_button {
     display: flex;
@@ -255,7 +252,4 @@ body {
     border-radius: 0rem 2.5rem 2.5rem 0rem;
 
     transition: all 0.1s linear;
-
-    /* grid-column-start: 1;
-    grid-column-end: 3; */
 }

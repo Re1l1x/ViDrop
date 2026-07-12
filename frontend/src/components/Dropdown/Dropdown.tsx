@@ -2,12 +2,13 @@
 import styles from "./Dropdown.module.css";
 import { useState, useEffect } from "react";
 interface Props {
-    options: number[] | undefined;
+    className?: string;
+    options: string[] | undefined;
 }
 
-const Dropdown = ({ options = [] }: Props) => {
+const Dropdown = ({ options = [], className }: Props) => {
     const [isOpen, setIsOpen] = useState(false);
-    const [selectedOption, setSelectedOption] = useState<number | undefined>(undefined);
+    const [selectedOption, setSelectedOption] = useState<string | undefined>(undefined);
 
     useEffect(() => {
         if (options.length > 0) {
@@ -15,7 +16,7 @@ const Dropdown = ({ options = [] }: Props) => {
         }
     }, [options]);
 
-    const handleOptionClick = (option: number | undefined) => {
+    const handleOptionClick = (option: string | undefined) => {
         setSelectedOption(option);
         setIsOpen(false);
     };
@@ -25,7 +26,7 @@ const Dropdown = ({ options = [] }: Props) => {
 
     return (
         <div className={styles.dropdown_wrapper}>
-            <button onClick={handleDropdownClick} className={styles.dropdown_button}>
+            <button onClick={handleDropdownClick} className={className || styles.dropdown_button}>
                 {selectedOption}
             </button>
             {isOpen && (

@@ -154,28 +154,30 @@ export default function Home() {
                                         </option>
                                     ))}
                                 </select> */}
-                                <Dropdown options={[10, 20, 30]} />
+                                <Dropdown options={["144", "240", "360", "480", "720", "1080"]} />
                             </div>
                             <div className={styles.control_row}>
                                 <div className={styles.section_name}>Audio</div>
                                 <ToggleSwitch checked={isAudioEnabled} onChange={() => setIsAudioEnabled(!isAudioEnabled)} />
                             </div>
                             <div className={styles.control_row}>
-                                <select className={styles.quality_selector} defaultValue="">
+                                {/* <select className={styles.quality_selector} defaultValue="">
                                     {videoInfo?.resolutions.map((resolution) => (
                                         <option key={resolution} value={resolution}>
                                             {resolution}p
                                         </option>
                                     ))}
-                                </select>
+                                </select> */}
+                                <Dropdown options={["172", "256", "320"]} />
                             </div>
                             <div className={styles.download_extension_button}>
                                 <button className={styles.download_button} onClick={getVideo}>
                                     Download
                                 </button>
-                                <select className={styles.extension_button} defaultValue="">
+                                {/* <select className={styles.extension_button} defaultValue="">
                                     <option> Prepfej </option>
-                                </select>
+                                </select> */}
+                                <Dropdown options={["mp4", "mp3", "avi"]} className={styles.extension_button} />
                             </div>
                         </div>
                     </div>
