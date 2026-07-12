@@ -29,7 +29,7 @@ func (d *Downloader) GetVideoID(url string) (string, error) {
 	return d.yt.GetVideoID(url)
 }
 
-func (d *Downloader) Download(url string, resolution int, audioBitrate int, format string) (string, error) {
+func (d *Downloader) Download(url string, resolution int, audioBitrate int, format string, onProgress func(int)) (string, error) {
 	videoID, err := d.yt.GetVideoID(url)
 	if err != nil {
 		return "", err
@@ -38,7 +38,7 @@ func (d *Downloader) Download(url string, resolution int, audioBitrate int, form
 	fileID := GenerateFileID(videoID, resolution, audioBitrate, format)
 	fileName := fileID + "." + format
 
-	tempPath, err := d.yt.Download(url, resolution, audioBitrate, format, fileName)
+	tempPath, err := d.yt.Download(url, resolution, audioBitrate, format, fileName, onProgress)
 	if err != nil {
 		return "", fmt.Errorf("download failed: %w", err)
 	}

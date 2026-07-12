@@ -20,12 +20,6 @@ func NewManager(runner *Runner) *Manager {
 	}
 }
 
-func (m *Manager) Create(job *DownloadJob) {
-	m.mu.Lock()
-	defer m.mu.Unlock()
-	m.jobs[job.ID] = job
-}
-
 func (m *Manager) StartDownload(url string, resolution int, audioBitrate int, format string) *DownloadJob {
 	jobID := generateID()
 

@@ -40,6 +40,10 @@ func (r *Runner) Run(j *DownloadJob) {
 		j.Resolution,
 		j.AudioBitrate,
 		j.Format,
+		func(p int) {
+			j.Progress = p
+			j.UpdatedAt = time.Now()
+		},
 	)
 	if err != nil {
 		j.Status = Error

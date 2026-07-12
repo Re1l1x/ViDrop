@@ -1,11 +1,14 @@
 package yt
 
 import (
+	"bufio"
 	"encoding/json"
 	"fmt"
 	"os/exec"
 	"path/filepath"
+	"regexp"
 	"sort"
+	"strconv"
 	"strings"
 )
 
@@ -40,9 +43,9 @@ type format struct {
 func (y *YtDlp) GetInfo(url string) (VideoInfo, error) {
 	cmd := exec.Command("yt-dlp", "-j", url)
 
-	out, err := cmd.Output()
+	out, err := cmd.CombinedOutput()
 	if err != nil {
-		return VideoInfo{}, err
+		return VideoInfo{}, fmt.Errorf("yt-dlp error: %s", string(out))
 	}
 
 	var raw ytResponse
@@ -95,7 +98,7 @@ func (y *YtDlp) GetVideoID(url string) (string, error) {
 	return strings.TrimSpace(string(id)), nil
 }
 
-func (y *YtDlp) Download(url string, resolution int, audioBitrate int, format string, fileName string) (string, error) {
+func (y *YtDlp) Download(url string, resolution int, audioBitrate int, format string, fileName string, onProgress func(int)) (string, error) {
 	formatSelector := fmt.Sprintf(
 		"bestvideo[height<=%d]+bestaudio[abr<=%d]/best",
 		resolution,
@@ -106,16 +109,75 @@ func (y *YtDlp) Download(url string, resolution int, audioBitrate int, format st
 
 	cmd := exec.Command(
 		"yt-dlp",
+		"--newline",
+		"--progress",
 		"-f", formatSelector,
 		"-o", outputPath,
 		"--merge-output-format", format,
 		url,
 	)
 
-	_, err := cmd.CombinedOutput()
+	stdout, err := cmd.StdoutPipe()
 	if err != nil {
 		return "", err
 	}
 
+	if err := cmd.Start(); err != nil {
+		return "", err
+	}
+
+	scanner := bufio.NewScanner(stdout)
+
+	const wideoWeight = 0.9
+	const audioWeight = 0.1
+	var stage int
+	var lastProgress int
+
+	for scanner.Scan() {
+		line := scanner.Text()
+
+		if strings.Contains(line, "Destination") {
+			stage++
+		}
+
+		if strings.Contains(line, "%") {
+			percent := parsePercent(line)
+			if percent >= 0 {
+				var total int
+
+				if stage == 1 {
+					total = int(float64(percent) * wideoWeight)
+				} else {
+					total = 90 + int(float64(percent)*audioWeight)
+				}
+
+				if total != lastProgress {
+					lastProgress = total
+					onProgress(total)
+				}
+			}
+		}
+	}
+
+	if err := cmd.Wait(); err != nil {
+		return "", err
+	}
+
 	return outputPath, nil
+}
+
+func parsePercent(line string) int {
+	re := regexp.MustCompile(`(\d+\.?\d*)%`)
+	match := re.FindStringSubmatch(line)
+
+	if len(match) < 2 {
+		return -1
+	}
+
+	f, err := strconv.ParseFloat(match[1], 64)
+	if err != nil {
+		return -1
+	}
+
+	return int(f)
 }
