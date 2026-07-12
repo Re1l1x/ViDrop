@@ -40,11 +40,22 @@
     font-size: 2.4rem;
 
     background-color: #202027;
-    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+    border: 0px;
+    border-radius: 2.5rem 2.5rem;
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+    /* потом посчитать сколько тень как там короче мбля */
+
+    overflow: hidden;
 }
 .dropdown_item {
     text-align: center;
 
     width: fit-content;
     min-width: 100%;
+    padding: 1rem;
+}
+.dropdown_item:hover {
+    background-color: #30303a;
+
+    cursor: pointer;
 }
