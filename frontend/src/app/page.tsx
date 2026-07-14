@@ -23,6 +23,10 @@ export default function Home() {
         bitrates: number[];
     } | null>(null);
 
+    const [selectedResolution, setSelectedResolution] = useState<string | undefined>(undefined);
+    const [selectedBitrate, setSelectedBitrate] = useState<string | undefined>(undefined);
+    const [selectedExtension, setSelectedExtension] = useState<string | undefined>(undefined);
+
     async function Download() {
         try {
             const response = await fetch("http://localhost:8080/download", {
@@ -147,20 +151,35 @@ export default function Home() {
                                 <ToggleSwitch checked={isVideoEnabled} onChange={() => setIsVideoEnabled(!isVideoEnabled)} />
                             </div>
                             <div className={styles.control_row}>
-                                <Dropdown options={["144", "240", "360", "480", "720", "1080"]} />
+                                <Dropdown
+                                    options={["144", "240", "360", "480", "720", "1080"]}
+                                    setSelectedOption={setSelectedResolution}
+                                    selectedOption={selectedResolution}
+                                    postfix="p"
+                                />
                             </div>
                             <div className={styles.control_row}>
                                 <div className={styles.section_name}>Audio</div>
                                 <ToggleSwitch checked={isAudioEnabled} onChange={() => setIsAudioEnabled(!isAudioEnabled)} />
                             </div>
                             <div className={styles.control_row}>
-                                <Dropdown options={["172", "256", "320"]} />
+                                <Dropdown
+                                    options={["172", "256", "320"]}
+                                    setSelectedOption={setSelectedBitrate}
+                                    selectedOption={selectedBitrate}
+                                    postfix="kbps"
+                                />
                             </div>
                             <div className={styles.download_extension_button}>
                                 <button className={styles.download_button} onClick={getVideo}>
                                     Download
                                 </button>
-                                <Dropdown options={["mp4", "mp3", "avi"]} className={styles.extension_button} />
+                                <Dropdown
+                                    options={["mp4", "mp3", "avi"]}
+                                    className={styles.extension_button}
+                                    setSelectedOption={setSelectedExtension}
+                                    selectedOption={selectedExtension}
+                                />
                             </div>
                         </div>
                     </div>
