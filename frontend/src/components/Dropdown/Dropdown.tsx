@@ -25,11 +25,11 @@ const Dropdown = ({ options = [], className }: Props) => {
     };
 
     return (
-        <div className={styles.dropdown_wrapper}>
+        <div className={`${styles.dropdown_wrapper} ${isOpen ? styles.menu_opened : ""}`}>
             <button onClick={handleDropdownClick} className={className || styles.dropdown_button}>
                 {selectedOption}
             </button>
-            {isOpen && (
+            <div className={`${styles.dropdown_mask} ${isOpen ? styles.menu_opened : ""}`}>
                 <div className={styles.dropdown_content}>
                     {options.map((option, index) => (
                         <div key={index} onClick={() => handleOptionClick(option)} className={styles.dropdown_item}>
@@ -37,7 +37,7 @@ const Dropdown = ({ options = [], className }: Props) => {
                         </div>
                     ))}
                 </div>
-            )}
+            </div>
         </div>
     );
 };

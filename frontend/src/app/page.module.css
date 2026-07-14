@@ -235,6 +235,8 @@ body {
     transition: all 0.1s linear;
 }
 .extension_button {
+    z-index: 2;
+
     display: flex;
     flex: 1;
     justify-content: center;
