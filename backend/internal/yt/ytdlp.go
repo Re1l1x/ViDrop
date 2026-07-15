@@ -2,6 +2,7 @@ package yt
 
 import (
 	"bufio"
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"os/exec"
@@ -43,14 +44,17 @@ type format struct {
 func (y *YtDlp) GetInfo(url string) (VideoInfo, error) {
 	cmd := exec.Command("yt-dlp", "-j", url)
 
-	out, err := cmd.CombinedOutput()
+	var stderr bytes.Buffer
+	cmd.Stderr = &stderr
+
+	out, err := cmd.Output()
 	if err != nil {
-		return VideoInfo{}, fmt.Errorf("yt-dlp error: %s", string(out))
+		return VideoInfo{}, fmt.Errorf("yt-dlp: get video info: %w: %s", err, stderr.String())
 	}
 
 	var raw ytResponse
 	if err := json.Unmarshal(out, &raw); err != nil {
-		return VideoInfo{}, err
+		return VideoInfo{}, fmt.Errorf("yt-dlp: parse response: %w", err)
 	}
 
 	resMap := make(map[int]struct{})
@@ -92,7 +96,7 @@ func (y *YtDlp) GetVideoID(url string) (string, error) {
 
 	id, err := cmd.Output()
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("yt-dlp: get video id: %w", err)
 	}
 
 	return strings.TrimSpace(string(id)), nil
@@ -117,16 +121,16 @@ func (y *YtDlp) Download(url string, resolution int, audioBitrate int, format st
 		url,
 	)
 
-	stdout, err := cmd.StdoutPipe()
+	stderr, err := cmd.StderrPipe()
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("yt-dlp: create stderr pipe: %w", err)
 	}
 
 	if err := cmd.Start(); err != nil {
-		return "", err
+		return "", fmt.Errorf("yt-dlp: start process: %w", err)
 	}
 
-	scanner := bufio.NewScanner(stdout)
+	scanner := bufio.NewScanner(stderr)
 
 	const wideoWeight = 0.9
 	const audioWeight = 0.1
@@ -159,8 +163,12 @@ func (y *YtDlp) Download(url string, resolution int, audioBitrate int, format st
 		}
 	}
 
+	if err := scanner.Err(); err != nil {
+		return "", fmt.Errorf("yt-dlp: read output: %w", err)
+	}
+
 	if err := cmd.Wait(); err != nil {
-		return "", err
+		return "", fmt.Errorf("yt-dlp: download failed: %w", err)
 	}
 
 	return outputPath, nil

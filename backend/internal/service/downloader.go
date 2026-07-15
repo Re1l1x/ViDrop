@@ -4,6 +4,7 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
+	"log/slog"
 
 	"ViDrop/internal/storage"
 	"ViDrop/internal/yt"
@@ -22,17 +23,25 @@ func NewDownloader(ytClient *yt.YtDlp, storage storage.Storage) *Downloader {
 }
 
 func (d *Downloader) GetInfo(url string) (yt.VideoInfo, error) {
-	return d.yt.GetInfo(url)
-}
+	slog.Info("getting video info", "url", url)
 
-func (d *Downloader) GetVideoID(url string) (string, error) {
-	return d.yt.GetVideoID(url)
+	info, err := d.yt.GetInfo(url)
+
+	if err != nil {
+		slog.Error("failed to get video info", "error", err)
+
+		return yt.VideoInfo{}, fmt.Errorf("service: get video info: %w", err)
+	}
+
+	slog.Info("video info received", "title", info.Title)
+
+	return info, nil
 }
 
 func (d *Downloader) Download(url string, resolution int, audioBitrate int, format string, onProgress func(int)) (string, error) {
 	videoID, err := d.yt.GetVideoID(url)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("service: get video id: %w", err)
 	}
 
 	fileID := GenerateFileID(videoID, resolution, audioBitrate, format)
@@ -40,12 +49,11 @@ func (d *Downloader) Download(url string, resolution int, audioBitrate int, form
 
 	tempPath, err := d.yt.Download(url, resolution, audioBitrate, format, fileName, onProgress)
 	if err != nil {
-		return "", fmt.Errorf("download failed: %w", err)
+		return "", fmt.Errorf("service: download video: %w", err)
 	}
 
-	_, err = d.storage.Save(tempPath, fileName)
-	if err != nil {
-		return "", fmt.Errorf("save failed: %w", err)
+	if _, err := d.storage.Save(tempPath, fileName); err != nil {
+		return "", fmt.Errorf("service: save file: %w", err)
 	}
 
 	return fileID, nil
@@ -59,5 +67,14 @@ func GenerateFileID(videoID string, resolution int, audioBitrate int, format str
 }
 
 func (d *Downloader) GetFilePath(fileID string) (string, error) {
-	return d.storage.Get(fileID)
+	path, err := d.storage.Get(fileID)
+	if err != nil {
+		slog.Error("failed to get file", "file_id", fileID, "error", err)
+
+		return "", fmt.Errorf("service: get file: %w", err)
+	}
+
+	slog.Info("file found", "file_id", fileID)
+
+	return path, nil
 }

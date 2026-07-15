@@ -1,14 +1,16 @@
 package main
 
 import (
-	"log"
+	"log/slog"
 	"net/http"
+	"os"
 	"time"
 
 	"ViDrop/internal/api"
 	"ViDrop/internal/api/handler"
 	"ViDrop/internal/config"
 	"ViDrop/internal/job"
+	"ViDrop/internal/logger"
 	"ViDrop/internal/middleware"
 	"ViDrop/internal/service"
 	"ViDrop/internal/storage"
@@ -16,7 +18,19 @@ import (
 )
 
 func main() {
+	logger.Init()
+
 	cfg := config.New()
+
+	if err := os.MkdirAll(cfg.TempDir, 0755); err != nil {
+		slog.Error("failed to create temp directory", "error", err)
+		return
+	}
+
+	if err := os.MkdirAll(cfg.DownloadDir, 0755); err != nil {
+		slog.Error("failed to create download directory", "error", err)
+		return
+	}
 
 	ytClient := yt.New(cfg.TempDir)
 	store := storage.NewLocalStorage(cfg.DownloadDir)
@@ -30,8 +44,6 @@ func main() {
 	mux := http.NewServeMux()
 	api.RegisterRoutes(mux, handler)
 
-	log.Println("Server running on http://localhost:8080")
-
 	server := &http.Server{
 		Addr:         ":8080",
 		Handler:      middleware.Middleware(mux),
@@ -40,5 +52,9 @@ func main() {
 		IdleTimeout:  60 * time.Second,
 	}
 
-	log.Fatal(server.ListenAndServe())
+	slog.Info("server started", "addr", server.Addr)
+
+	if err := server.ListenAndServe(); err != nil {
+		slog.Error("server stopped", "error", err)
+	}
 }

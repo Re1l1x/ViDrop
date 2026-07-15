@@ -13,11 +13,10 @@ WORKDIR /app
 
 RUN apk add --no-cache \
     ffmpeg \
-    yt-dlp
+    yt-dlp \
+    deno
 
 COPY --from=builder /app/vidrop .
-
-RUN mkdir temp downloads
 
 EXPOSE 8080
 

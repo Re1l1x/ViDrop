@@ -1,6 +1,7 @@
 package job
 
 import (
+	"log/slog"
 	"time"
 
 	"ViDrop/internal/service"
@@ -20,22 +21,16 @@ func (r *Runner) Run(j *DownloadJob) {
 	j.Status = Downloading
 	j.UpdatedAt = time.Now()
 
-	videoID, err := r.downloader.GetVideoID(j.URL)
-	if err != nil {
-		j.Status = Error
-		j.Error = err.Error()
-		return
-	}
+	slog.Info(
+		"download job started",
+		"job_id", j.ID,
+		"url", j.URL,
+		"resolution", j.Resolution,
+		"audio_bitrate", j.AudioBitrate,
+		"format", j.Format,
+	)
 
-	fileID := service.GenerateFileID(videoID, j.Resolution, j.AudioBitrate, j.Format)
-	j.FileID = fileID
-
-	if _, err := r.downloader.GetFilePath(fileID); err == nil {
-		j.Status = Done
-		return
-	}
-
-	fileID, err = r.downloader.Download(
+	fileID, err := r.downloader.Download(
 		j.URL,
 		j.Resolution,
 		j.AudioBitrate,
@@ -45,13 +40,19 @@ func (r *Runner) Run(j *DownloadJob) {
 			j.UpdatedAt = time.Now()
 		},
 	)
+
 	if err != nil {
 		j.Status = Error
 		j.Error = err.Error()
+		j.UpdatedAt = time.Now()
+
+		slog.Error("download job failed", "job_id", j.ID, "error", err)
 		return
 	}
 
 	j.Status = Done
 	j.FileID = fileID
 	j.UpdatedAt = time.Now()
+
+	slog.Info("download job completed", "job_id", j.ID, "file_id", fileID)
 }
