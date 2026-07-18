@@ -21,7 +21,7 @@ body {
     justify-content: flex-start;
     align-items: center;
 
-    width: 66.7vw;
+    min-width: 66.7vw;
 }
 
 .header_container {
@@ -44,7 +44,7 @@ body {
 .title.urlSubmitted {
     margin: 3rem 0px;
 
-    font-size: 7rem;
+    font-size: 6.4rem;
 
     transition:
         margin 0.3s ease-out,
@@ -132,9 +132,10 @@ body {
     flex-direction: column;
 
     width: 55%;
+    min-width: fit-content;
 }
 .video_container img {
-    height: 100%;
+    height: 40vh; /* временное решение */
 
     aspect-ratio: 16/9;
 }
@@ -153,6 +154,7 @@ body {
     flex-direction: column;
 
     width: 25%;
+    min-width: fit-content;
     padding: 3rem;
     gap: 2rem;
 

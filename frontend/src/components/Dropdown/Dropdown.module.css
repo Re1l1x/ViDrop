@@ -7,7 +7,7 @@
 
     width: fit-content;
 
-    transition: z-index 0s 0.3s ease-in-out;
+    transition: z-index 0s 0.2s ease-in-out;
 }
 .dropdown_wrapper.menu_opened {
     z-index: 10;
@@ -48,7 +48,7 @@
     border-radius: 2.5rem 2.5rem;
     box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2); /* потом посчитать сколько тень как там короче мбля */
 
-    transition: all 0.3s ease-in-out;
+    transition: all 0.2s ease-in-out;
 
     grid-template-rows: 0fr;
 

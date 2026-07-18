@@ -18,15 +18,20 @@ export default function Home() {
     const containerRef = useRef<HTMLDivElement>(null);
     const [videoInfo, setVideoInfo] = useState<{
         title: string;
-        thumbnail_url: string;
-        resolutions: number[];
-        bitrates: number[];
+        thumbnail: string;
+        resolutions: string[];
+        audio_bitrates: string[];
     } | null>(null);
 
     const [selectedResolution, setSelectedResolution] = useState<string | undefined>(undefined);
     const [selectedBitrate, setSelectedBitrate] = useState<string | undefined>(undefined);
     const [selectedExtension, setSelectedExtension] = useState<string | undefined>(undefined);
 
+    const evtSource = new EventSource("http://localhost:8080/events");
+
+    evtSource.addEventListener("progress", (event) => {
+        const data = JSON.parse(event.data);
+    });
     async function Download() {
         try {
             const response = await fetch("http://localhost:8080/download", {
@@ -92,6 +97,7 @@ export default function Home() {
         console.log("Getting video info for URL:", input);
         fetch("http://localhost:8080/info", {
             method: "POST",
+
             headers: {
                 "Content-Type": "application/json",
             },
@@ -142,7 +148,7 @@ export default function Home() {
                 <div className={`${styles.main_page} ${isUrlEntered ? styles.urlSubmitted : ""}`}>
                     <div className={styles.info_container}>
                         <div className={styles.video_container}>
-                            <img src={videoInfo?.thumbnail_url} alt={videoInfo?.title} />
+                            <img src={videoInfo?.thumbnail} alt={videoInfo?.title} />
                             <div className={styles.video_name}>{videoInfo?.title}</div>
                         </div>
                         <div className={styles.control_container}>
@@ -152,7 +158,7 @@ export default function Home() {
                             </div>
                             <div className={styles.control_row}>
                                 <Dropdown
-                                    options={["144", "240", "360", "480", "720", "1080"]}
+                                    options={videoInfo?.resolutions}
                                     setSelectedOption={setSelectedResolution}
                                     selectedOption={selectedResolution}
                                     postfix="p"
@@ -164,7 +170,7 @@ export default function Home() {
                             </div>
                             <div className={styles.control_row}>
                                 <Dropdown
-                                    options={["172", "256", "320"]}
+                                    options={videoInfo?.audio_bitrates}
                                     setSelectedOption={setSelectedBitrate}
                                     selectedOption={selectedBitrate}
                                     postfix="kbps"
