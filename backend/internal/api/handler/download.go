@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"strings"
 
 	"ViDrop/internal/api/handler/dto"
 	"ViDrop/internal/job"
@@ -34,7 +33,7 @@ func (h *Handler) StartDownload(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) GetDownloadProgress(w http.ResponseWriter, r *http.Request) {
-	jobID := strings.TrimPrefix(r.URL.Path, "/download/progress/")
+	jobID := r.PathValue("id")
 
 	task, ok := h.jobs.Get(jobID)
 	if !ok {
@@ -93,9 +92,9 @@ func (h *Handler) GetDownloadProgress(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) GetDownloadStatus(w http.ResponseWriter, r *http.Request) {
-	id := strings.TrimPrefix(r.URL.Path, "/download/")
+	jobID := r.PathValue("id")
 
-	task, ok := h.jobs.Get(id)
+	task, ok := h.jobs.Get(jobID)
 	if !ok {
 		http.Error(w, "not found", http.StatusNotFound)
 		return
