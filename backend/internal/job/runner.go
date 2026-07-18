@@ -24,7 +24,7 @@ func (r *Runner) Run(j *DownloadJob) {
 	j.UpdatedAt = time.Now()
 	r.publish(j)
 
-	slog.Info(
+	slog.Debug(
 		"download job started",
 		"job_id", j.ID,
 		"url", j.URL,
@@ -65,7 +65,7 @@ func (r *Runner) Run(j *DownloadJob) {
 
 	r.publish(j)
 
-	slog.Info("download job completed", "job_id", j.ID, "file_id", fileID)
+	slog.Debug("download job completed", "job_id", j.ID, "file_id", fileID)
 }
 
 func (r *Runner) publish(j *DownloadJob) {

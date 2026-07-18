@@ -36,7 +36,7 @@ func (b *Broker) Subscribe(jobID string) (<-chan DownloadEvent, func()) {
 
 	b.subscribers[jobID][ch] = struct{}{}
 
-	slog.Info("sse client subscribed", "job_id", jobID, "subscribers", len(b.subscribers[jobID]))
+	slog.Debug("sse client subscribed", "job_id", jobID, "subscribers", len(b.subscribers[jobID]))
 
 	unsubscribe := func() {
 		b.mu.Lock()

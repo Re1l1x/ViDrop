@@ -23,7 +23,7 @@ func NewDownloader(ytClient *yt.YtDlp, storage storage.Storage) *Downloader {
 }
 
 func (d *Downloader) GetInfo(url string) (yt.VideoInfo, error) {
-	slog.Info("getting video info", "url", url)
+	slog.Debug("getting video info", "url", url)
 
 	info, err := d.yt.GetInfo(url)
 
@@ -33,7 +33,7 @@ func (d *Downloader) GetInfo(url string) (yt.VideoInfo, error) {
 		return yt.VideoInfo{}, fmt.Errorf("service: get video info: %w", err)
 	}
 
-	slog.Info("video info received", "title", info.Title)
+	slog.Debug("video info received", "title", info.Title)
 
 	return info, nil
 }
@@ -74,7 +74,7 @@ func (d *Downloader) GetFilePath(fileID string) (string, error) {
 		return "", fmt.Errorf("service: get file: %w", err)
 	}
 
-	slog.Info("file found", "file_id", fileID)
+	slog.Debug("file found", "file_id", fileID)
 
 	return path, nil
 }
