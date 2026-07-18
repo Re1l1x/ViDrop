@@ -121,16 +121,16 @@ func (y *YtDlp) Download(url string, resolution int, audioBitrate int, format st
 		url,
 	)
 
-	stderr, err := cmd.StderrPipe()
+	stdout, err := cmd.StdoutPipe()
 	if err != nil {
-		return "", fmt.Errorf("yt-dlp: create stderr pipe: %w", err)
+		return "", fmt.Errorf("yt-dlp: create stdout pipe: %w", err)
 	}
 
 	if err := cmd.Start(); err != nil {
 		return "", fmt.Errorf("yt-dlp: start process: %w", err)
 	}
 
-	scanner := bufio.NewScanner(stderr)
+	scanner := bufio.NewScanner(stdout)
 
 	const wideoWeight = 0.9
 	const audioWeight = 0.1

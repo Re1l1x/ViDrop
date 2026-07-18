@@ -10,5 +10,6 @@ func RegisterRoutes(mux *http.ServeMux, handler *handler.Handler) {
 	mux.HandleFunc("/info", handler.GetVideoInfo)
 	mux.HandleFunc("POST /download", handler.StartDownload)
 	mux.HandleFunc("GET /download/", handler.GetDownloadStatus)
+	mux.HandleFunc("GET /download/progress/", handler.GetDownloadProgress)
 	mux.HandleFunc("/file/", handler.GetFile)
 }

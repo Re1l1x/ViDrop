@@ -35,11 +35,12 @@ func main() {
 	ytClient := yt.New(cfg.TempDir)
 	store := storage.NewLocalStorage(cfg.DownloadDir)
 
+	broker := job.NewBroker()
 	downloader := service.NewDownloader(ytClient, store)
-	runner := job.NewRunner(downloader)
+	runner := job.NewRunner(downloader, broker)
 	jobs := job.NewManager(runner)
 
-	handler := handler.NewHandler(downloader, jobs)
+	handler := handler.NewHandler(downloader, jobs, broker)
 
 	mux := http.NewServeMux()
 	api.RegisterRoutes(mux, handler)

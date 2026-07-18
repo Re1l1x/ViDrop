@@ -9,17 +9,20 @@ import (
 
 type Runner struct {
 	downloader *service.Downloader
+	broker     *Broker
 }
 
-func NewRunner(d *service.Downloader) *Runner {
+func NewRunner(d *service.Downloader, b *Broker) *Runner {
 	return &Runner{
 		downloader: d,
+		broker:     b,
 	}
 }
 
 func (r *Runner) Run(j *DownloadJob) {
 	j.Status = Downloading
 	j.UpdatedAt = time.Now()
+	r.publish(j)
 
 	slog.Info(
 		"download job started",
@@ -38,6 +41,8 @@ func (r *Runner) Run(j *DownloadJob) {
 		func(p int) {
 			j.Progress = p
 			j.UpdatedAt = time.Now()
+
+			r.publish(j)
 		},
 	)
 
@@ -46,13 +51,28 @@ func (r *Runner) Run(j *DownloadJob) {
 		j.Error = err.Error()
 		j.UpdatedAt = time.Now()
 
+		r.publish(j)
+
 		slog.Error("download job failed", "job_id", j.ID, "error", err)
+
 		return
 	}
 
 	j.Status = Done
+	j.Progress = 100
 	j.FileID = fileID
 	j.UpdatedAt = time.Now()
 
+	r.publish(j)
+
 	slog.Info("download job completed", "job_id", j.ID, "file_id", fileID)
+}
+
+func (r *Runner) publish(j *DownloadJob) {
+	r.broker.Publish(j.ID, DownloadEvent{
+		Status:   j.Status,
+		Progress: j.Progress,
+		FileID:   j.FileID,
+		Error:    j.Error,
+	})
 }

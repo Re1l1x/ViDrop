@@ -18,10 +18,9 @@ type DownloadJob struct {
 	Resolution   int
 	AudioBitrate int
 	Format       string
-
-	Status    Status
-	Progress  int
-	Error     string
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	Status       Status
+	Progress     int
+	Error        string
+	CreatedAt    time.Time
+	UpdatedAt    time.Time
 }

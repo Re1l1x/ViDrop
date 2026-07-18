@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strings"
 
@@ -30,6 +31,65 @@ func (h *Handler) StartDownload(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(res)
+}
+
+func (h *Handler) GetDownloadProgress(w http.ResponseWriter, r *http.Request) {
+	jobID := strings.TrimPrefix(r.URL.Path, "/download/progress/")
+
+	task, ok := h.jobs.Get(jobID)
+	if !ok {
+		http.Error(w, "job not found", http.StatusNotFound)
+		return
+	}
+
+	flusher, ok := w.(http.Flusher)
+	if !ok {
+		http.Error(w, "streaming unsupported", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "text/event-stream")
+	w.Header().Set("Cache-Control", "no-cache")
+	w.Header().Set("Connection", "keep-alive")
+
+	ch, unsubscribe := h.broker.Subscribe(jobID)
+	defer unsubscribe()
+
+	send := func(event job.DownloadEvent) error {
+		data, err := json.Marshal(event)
+		if err != nil {
+			return err
+		}
+
+		if _, err := fmt.Fprintf(w, "data: %s\n\n", data); err != nil {
+			return err
+		}
+
+		flusher.Flush()
+
+		return nil
+	}
+
+	if err := send(job.DownloadEvent{
+		Status:   task.Status,
+		Progress: task.Progress,
+		FileID:   task.FileID,
+		Error:    task.Error,
+	}); err != nil {
+		return
+	}
+
+	for {
+		select {
+		case event := <-ch:
+			if err := send(event); err != nil {
+				return
+			}
+
+		case <-r.Context().Done():
+			return
+		}
+	}
 }
 
 func (h *Handler) GetDownloadStatus(w http.ResponseWriter, r *http.Request) {
