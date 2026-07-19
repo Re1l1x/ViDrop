@@ -7,7 +7,6 @@ import Dropdown from "@/components/Dropdown/Dropdown";
 
 export default function Home() {
     const [inputUrl, setInputUrl] = useState<string>("");
-    const [downloadUrl, setDownloadUrl] = useState<string>("");
 
     const [isUrlEntered, setIsUrlEntered] = useState<boolean>(false);
     const targetLength = 43;
@@ -23,16 +22,18 @@ export default function Home() {
         audio_bitrates: string[];
     } | null>(null);
 
+    const [videoStatus, setVideoStatus] = useState<{
+        fileId: string;
+        status: string;
+        progress: number;
+        error: string;
+    } | null>(null);
+
     const [selectedResolution, setSelectedResolution] = useState<string | undefined>(undefined);
     const [selectedBitrate, setSelectedBitrate] = useState<string | undefined>(undefined);
     const [selectedExtension, setSelectedExtension] = useState<string | undefined>(undefined);
 
-    const evtSource = new EventSource("http://localhost:8080/events");
-
-    evtSource.addEventListener("progress", (event) => {
-        const data = JSON.parse(event.data);
-    });
-    async function Download() {
+    async function downloadVideo() {
         try {
             const response = await fetch("http://localhost:8080/download", {
                 method: "POST",
@@ -40,20 +41,33 @@ export default function Home() {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                    url: inputUrl,
+                    URL: inputUrl,
+                    resolution: selectedResolution,
+                    audioBitrate: selectedBitrate,
+                    format: selectedExtension,
                 }),
             });
-
             const result = await response.json();
-            setDownloadUrl(result.download_url);
+            ProgressCheck(result.jobId);
         } catch (error) {
             const e = error as Error;
             console.error(e.message);
         }
     }
 
-    function getVideo() {
-        window.location.href = `http://localhost:8080${downloadUrl}`;
+    async function ProgressCheck(jobId: string) {
+        const evtSource = new EventSource(`http://localhost:8080/download/${jobId}/events`);
+        evtSource.onmessage = (event) => {
+            setVideoStatus(event.data);
+            if (event.data.status === "done") {
+                getVideo(event.data.fileId);
+                evtSource.close();
+            }
+        };
+    }
+
+    function getVideo(fileId: string) {
+        window.location.href = `http://localhost:8080${fileId}`;
     }
 
     const onChangeUrl = (e: ChangeEvent<HTMLInputElement>) => {
@@ -177,8 +191,8 @@ export default function Home() {
                                 />
                             </div>
                             <div className={styles.download_extension_button}>
-                                <button className={styles.download_button} onClick={getVideo}>
-                                    Download
+                                <button className={styles.download_button} onClick={downloadVideo}>
+                                    Download {videoStatus?.progress ? `(${videoStatus.progress}%)` : ""}
                                 </button>
                                 <Dropdown
                                     options={["mp4", "mp3", "avi"]}
