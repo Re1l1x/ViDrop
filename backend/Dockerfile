@@ -7,14 +7,23 @@ COPY . .
 RUN go build -o vidrop ./cmd/api
 
 
-FROM alpine:3.22
+FROM python:3.13-slim
 
 WORKDIR /app
 
-RUN apk add --no-cache \
+RUN apt-get update && apt-get install -y \
     ffmpeg \
+    curl \
+    unzip \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN curl -fsSL https://deno.land/install.sh | sh
+
+ENV PATH="/root/.deno/bin:$PATH"
+
+RUN pip install --no-cache-dir -U \
     yt-dlp \
-    deno
+    yt-dlp-ejs
 
 COPY --from=builder /app/vidrop .
 
