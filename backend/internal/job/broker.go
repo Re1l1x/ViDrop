@@ -5,33 +5,33 @@ import (
 	"sync"
 )
 
-type DownloadEvent struct {
-	FileID   string `json:"file_id,omitempty"`
-	Status   Status `json:"status"`
-	Progress int    `json:"progress"`
-	Error    string `json:"error,omitempty"`
+type ProgressEvent struct {
+	Status   Status
+	Progress int
+	FileID   string
+	Error    string
 }
 
 type Broker struct {
 	mu sync.RWMutex
 
-	subscribers map[string]map[chan DownloadEvent]struct{}
+	subscribers map[string]map[chan ProgressEvent]struct{}
 }
 
 func NewBroker() *Broker {
 	return &Broker{
-		subscribers: make(map[string]map[chan DownloadEvent]struct{}),
+		subscribers: make(map[string]map[chan ProgressEvent]struct{}),
 	}
 }
 
-func (b *Broker) Subscribe(jobID string) (<-chan DownloadEvent, func()) {
-	ch := make(chan DownloadEvent, 8)
+func (b *Broker) Subscribe(jobID string) (<-chan ProgressEvent, func()) {
+	ch := make(chan ProgressEvent, 8)
 
 	b.mu.Lock()
 	defer b.mu.Unlock()
 
 	if _, ok := b.subscribers[jobID]; !ok {
-		b.subscribers[jobID] = make(map[chan DownloadEvent]struct{})
+		b.subscribers[jobID] = make(map[chan ProgressEvent]struct{})
 	}
 
 	b.subscribers[jobID][ch] = struct{}{}
@@ -52,7 +52,7 @@ func (b *Broker) Subscribe(jobID string) (<-chan DownloadEvent, func()) {
 	return ch, unsubscribe
 }
 
-func (b *Broker) Publish(jobID string, event DownloadEvent) {
+func (b *Broker) Publish(jobID string, event ProgressEvent) {
 	b.mu.RLock()
 	defer b.mu.RUnlock()
 

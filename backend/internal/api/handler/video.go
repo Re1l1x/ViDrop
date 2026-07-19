@@ -8,7 +8,7 @@ import (
 )
 
 func (h *Handler) GetVideoInfo(w http.ResponseWriter, r *http.Request) {
-	var req dto.InfoRequest
+	var req dto.VideoInfoRequest
 
 	err := json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
@@ -22,7 +22,7 @@ func (h *Handler) GetVideoInfo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	res := dto.InfoResponse{
+	res := dto.VideoInfoResponse{
 		Title:         info.Title,
 		Thumbnail:     info.Thumbnail,
 		Resolutions:   info.Resolutions,

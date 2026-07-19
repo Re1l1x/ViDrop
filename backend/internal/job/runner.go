@@ -69,7 +69,7 @@ func (r *Runner) Run(j *DownloadJob) {
 }
 
 func (r *Runner) publish(j *DownloadJob) {
-	r.broker.Publish(j.ID, DownloadEvent{
+	r.broker.Publish(j.ID, ProgressEvent{
 		Status:   j.Status,
 		Progress: j.Progress,
 		FileID:   j.FileID,

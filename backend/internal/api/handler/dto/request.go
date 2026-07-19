@@ -1,10 +1,10 @@
 package dto
 
-type InfoRequest struct {
+type VideoInfoRequest struct {
 	URL string `json:"url"`
 }
 
-type DownloadRequest struct {
+type StartDownloadRequest struct {
 	URL          string `json:"url"`
 	Resolution   int    `json:"resolution"`
 	AudioBitrate int    `json:"audio_bitrate"`
