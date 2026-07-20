@@ -67,7 +67,7 @@ func GenerateFileID(videoID string, resolution int, audioBitrate int, format str
 }
 
 func (d *Downloader) GetFilePath(fileID string) (string, error) {
-	path, err := d.storage.Get(fileID)
+	filePath, err := d.storage.Get(fileID)
 	if err != nil {
 		slog.Error("failed to get file", "file_id", fileID, "error", err)
 
@@ -76,5 +76,5 @@ func (d *Downloader) GetFilePath(fileID string) (string, error) {
 
 	slog.Debug("file found", "file_id", fileID)
 
-	return path, nil
+	return filePath, nil
 }

@@ -91,17 +91,6 @@ func (y *YtDlp) GetInfo(url string) (VideoInfo, error) {
 	}, nil
 }
 
-func (y *YtDlp) GetVideoID(url string) (string, error) {
-	cmd := exec.Command("yt-dlp", "--print", "id", url)
-
-	id, err := cmd.Output()
-	if err != nil {
-		return "", fmt.Errorf("yt-dlp: get video id: %w", err)
-	}
-
-	return strings.TrimSpace(string(id)), nil
-}
-
 func (y *YtDlp) Download(url string, resolution int, audioBitrate int, format string, fileName string, onProgress func(int)) (string, error) {
 	formatSelector := fmt.Sprintf(
 		"bestvideo[height<=%d]+bestaudio[abr<=%d]/best",
@@ -172,6 +161,17 @@ func (y *YtDlp) Download(url string, resolution int, audioBitrate int, format st
 	}
 
 	return outputPath, nil
+}
+
+func (y *YtDlp) GetVideoID(url string) (string, error) {
+	cmd := exec.Command("yt-dlp", "--print", "id", url)
+
+	id, err := cmd.Output()
+	if err != nil {
+		return "", fmt.Errorf("yt-dlp: get video id: %w", err)
+	}
+
+	return strings.TrimSpace(string(id)), nil
 }
 
 func parsePercent(line string) int {

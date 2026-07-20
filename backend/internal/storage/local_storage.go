@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 type LocalStorage struct {
@@ -21,17 +22,24 @@ func (s *LocalStorage) Save(tempPath string, fileName string) (string, error) {
 		return "", fmt.Errorf("storage: move file: %w", err)
 	}
 
-	return fileName, nil
+	return destPath, nil
 }
 
 func (s *LocalStorage) Get(fileID string) (string, error) {
-	path := filepath.Join(s.basePath, fileID)
-
-	if _, err := os.Stat(path); err != nil {
-		return "", fmt.Errorf("storage: check file: %w", err)
+	entries, err := os.ReadDir(s.basePath)
+	if err != nil {
+		return "", fmt.Errorf("storage: read dir: %w", err)
 	}
 
-	return path, nil
+	prefix := fileID + "."
+
+	for _, entry := range entries {
+		if strings.HasPrefix(entry.Name(), prefix) {
+			return filepath.Join(s.basePath, entry.Name()), nil
+		}
+	}
+
+	return "", fmt.Errorf("storage: file not found")
 }
 
 func (s *LocalStorage) Delete(fileID string) error {

@@ -27,13 +27,13 @@ func main() {
 		return
 	}
 
-	if err := os.MkdirAll(cfg.DownloadDir, 0755); err != nil {
+	if err := os.MkdirAll(cfg.MediaDir, 0755); err != nil {
 		slog.Error("failed to create download directory", "error", err)
 		return
 	}
 
 	ytClient := yt.New(cfg.TempDir)
-	store := storage.NewLocalStorage(cfg.DownloadDir)
+	store := storage.NewLocalStorage(cfg.MediaDir)
 
 	broker := job.NewBroker()
 	downloader := service.NewDownloader(ytClient, store)

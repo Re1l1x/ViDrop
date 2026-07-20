@@ -6,15 +6,15 @@ import (
 )
 
 type Config struct {
-	TempDir     string
-	DownloadDir string
+	TempDir  string
+	MediaDir string
 }
 
 func New() *Config {
 	wd, _ := os.Getwd()
 
 	return &Config{
-		TempDir:     filepath.Join(wd, "storage/temp"),
-		DownloadDir: filepath.Join(wd, "storage/media"),
+		TempDir:  filepath.Join(wd, "storage/temp"),
+		MediaDir: filepath.Join(wd, "storage/media"),
 	}
 }

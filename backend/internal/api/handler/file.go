@@ -2,17 +2,20 @@ package handler
 
 import (
 	"net/http"
+	"path/filepath"
 )
 
 func (h *Handler) GetFile(w http.ResponseWriter, r *http.Request) {
 	fileID := r.PathValue("id")
 
-	path, err := h.downloader.GetFilePath(fileID)
+	filePath, err := h.downloader.GetFilePath(fileID)
 	if err != nil {
 		http.Error(w, "file not found", http.StatusNotFound)
 		return
 	}
 
-	w.Header().Set("Content-Disposition", "attachment; filename=\""+fileID+"\"")
-	http.ServeFile(w, r, path)
+	fileName := filepath.Base(filePath)
+
+	w.Header().Set("Content-Disposition", "attachment; filename=\""+fileName+"\"")
+	http.ServeFile(w, r, filePath)
 }
