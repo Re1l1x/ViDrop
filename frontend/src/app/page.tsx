@@ -1,6 +1,6 @@
 "use client";
 
-import { ChangeEvent, useState, useRef } from "react";
+import { ChangeEvent, useState, useRef, useEffect } from "react";
 import styles from "./page.module.css";
 import ToggleSwitch from "@/components/ToggleSwitch/ToggleSwitch";
 import Dropdown from "@/components/Dropdown/Dropdown";
@@ -14,7 +14,9 @@ export default function Home() {
     const [isVideoEnabled, setIsVideoEnabled] = useState(true);
     const [isAudioEnabled, setIsAudioEnabled] = useState(true);
 
-    const containerRef = useRef<HTMLDivElement>(null);
+    const mainContainerRef = useRef<HTMLDivElement>(null);
+    const videoContainerRef = useRef<HTMLDivElement>(null);
+    const controlContainerRef = useRef<HTMLDivElement>(null);
     const [videoInfo, setVideoInfo] = useState<{
         title: string;
         thumbnail: string;
@@ -23,9 +25,9 @@ export default function Home() {
     } | null>(null);
 
     const [videoStatus, setVideoStatus] = useState<{
-        fileId: string;
         status: string;
         progress: number;
+        file_id: string;
         error: string;
     } | null>(null);
 
@@ -41,14 +43,14 @@ export default function Home() {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                    URL: inputUrl,
+                    url: inputUrl,
                     resolution: selectedResolution,
-                    audioBitrate: selectedBitrate,
+                    audio_bitrate: selectedBitrate,
                     format: selectedExtension,
                 }),
             });
             const result = await response.json();
-            ProgressCheck(result.jobId);
+            ProgressCheck(result.job_id);
         } catch (error) {
             const e = error as Error;
             console.error(e.message);
@@ -58,17 +60,32 @@ export default function Home() {
     async function ProgressCheck(jobId: string) {
         const evtSource = new EventSource(`http://localhost:8080/download/${jobId}/events`);
         evtSource.onmessage = (event) => {
-            setVideoStatus(event.data);
-            if (event.data.status === "done") {
-                getVideo(event.data.fileId);
+            const data = JSON.parse(event.data);
+            setVideoStatus(data);
+            console.log(data.progress);
+            if (data.status === "done") {
+                getVideo(data.file_id);
                 evtSource.close();
             }
         };
     }
 
     function getVideo(fileId: string) {
-        window.location.href = `http://localhost:8080${fileId}`;
+        window.location.href = `http://localhost:8080/file/${fileId}.${selectedExtension}`;
     }
+
+    useEffect(() => {
+        const controlEl = controlContainerRef.current;
+        const videoEl = videoContainerRef.current;
+
+        if (controlEl && videoEl) {
+            const resizeObserver = new ResizeObserver(() => {
+                videoEl.style.maxHeight = controlEl.offsetHeight + "px";
+            });
+            resizeObserver.observe(controlContainerRef.current!);
+            return () => resizeObserver.disconnect();
+        }
+    }, []);
 
     const onChangeUrl = (e: ChangeEvent<HTMLInputElement>) => {
         const input = e.target.value;
@@ -77,11 +94,14 @@ export default function Home() {
         if (input.length >= targetLength) {
             setIsUrlEntered(true);
             expandContainer();
+            setSelectedBitrate(undefined);
+            setSelectedResolution(undefined);
+            setSelectedExtension(undefined);
             getVideoInfo(input);
         }
     };
     function expandContainer() {
-        const el = containerRef.current;
+        const el = mainContainerRef.current;
         if (!el) return;
 
         const start = el.scrollHeight;
@@ -154,18 +174,18 @@ export default function Home() {
 
     return (
         <div className={styles.layout}>
-            <div ref={containerRef} className={styles.container}>
+            <div ref={mainContainerRef} className={styles.container}>
                 <div className={styles.header_container}>
                     <div className={`${styles.title} ${isUrlEntered ? styles.urlSubmitted : ""}`}>ViDrop</div>
                     <input className={styles.input_line} onChange={onChangeUrl} type="text" placeholder="Paste Your URL..."></input>
                 </div>
                 <div className={`${styles.main_page} ${isUrlEntered ? styles.urlSubmitted : ""}`}>
                     <div className={styles.info_container}>
-                        <div className={styles.video_container}>
+                        <div ref={videoContainerRef} className={styles.video_container}>
                             <img src={videoInfo?.thumbnail} alt={videoInfo?.title} />
                             <div className={styles.video_name}>{videoInfo?.title}</div>
                         </div>
-                        <div className={styles.control_container}>
+                        <div ref={controlContainerRef} className={styles.control_container}>
                             <div className={styles.control_row}>
                                 <div className={styles.section_name}>Video</div>
                                 <ToggleSwitch checked={isVideoEnabled} onChange={() => setIsVideoEnabled(!isVideoEnabled)} />
@@ -192,7 +212,7 @@ export default function Home() {
                             </div>
                             <div className={styles.download_extension_button}>
                                 <button className={styles.download_button} onClick={downloadVideo}>
-                                    Download {videoStatus?.progress ? `(${videoStatus.progress}%)` : ""}
+                                    Download
                                 </button>
                                 <Dropdown
                                     options={["mp4", "mp3", "avi"]}
