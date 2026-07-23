@@ -212,7 +212,15 @@ export default function Home() {
                             </div>
                             <div className={styles.download_extension_button}>
                                 <button className={styles.download_button} onClick={downloadVideo}>
-                                    Download
+                                    <span className={`${styles.base_layer} ${videoStatus?.status == "downloading" ? styles.after_downloading : ""}`}>
+                                        Download
+                                    </span>
+                                    <span
+                                        className={styles.progress_layer}
+                                        style={{ clipPath: `inset(0 ${100 - (videoStatus?.progress ?? 0)}% 0 0)` }}
+                                    >
+                                        Download
+                                    </span>
                                 </button>
                                 <Dropdown
                                     options={["mp4", "mp3", "avi"]}
