@@ -1,6 +1,6 @@
-package storage
+package filestorage
 
-type Storage interface {
+type FileStorage interface {
 	Save(tempPath string, fileName string) (string, error)
 	Get(fileID string) (string, error)
 	Delete(fileID string) error

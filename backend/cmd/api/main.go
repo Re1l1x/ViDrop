@@ -13,7 +13,7 @@ import (
 	"ViDrop/internal/logger"
 	"ViDrop/internal/middleware"
 	"ViDrop/internal/service"
-	"ViDrop/internal/storage"
+	"ViDrop/internal/storage/filestorage"
 	"ViDrop/internal/yt"
 )
 
@@ -33,10 +33,10 @@ func main() {
 	}
 
 	ytClient := yt.New(cfg.TempDir)
-	store := storage.NewLocalStorage(cfg.MediaDir)
+	storage := filestorage.NewLocalStorage(cfg.MediaDir)
 
 	broker := job.NewBroker()
-	downloader := service.NewDownloader(ytClient, store)
+	downloader := service.NewDownloader(ytClient, storage)
 	runner := job.NewRunner(downloader, broker)
 	jobs := job.NewManager(runner)
 

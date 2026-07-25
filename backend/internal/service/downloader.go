@@ -6,16 +6,16 @@ import (
 	"fmt"
 	"log/slog"
 
-	"ViDrop/internal/storage"
+	"ViDrop/internal/storage/filestorage"
 	"ViDrop/internal/yt"
 )
 
 type Downloader struct {
 	yt      *yt.YtDlp
-	storage storage.Storage
+	storage filestorage.FileStorage
 }
 
-func NewDownloader(ytClient *yt.YtDlp, storage storage.Storage) *Downloader {
+func NewDownloader(ytClient *yt.YtDlp, storage filestorage.FileStorage) *Downloader {
 	return &Downloader{
 		yt:      ytClient,
 		storage: storage,
