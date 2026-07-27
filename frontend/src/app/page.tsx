@@ -4,6 +4,8 @@ import { ChangeEvent, useState, useRef, useEffect } from "react";
 import styles from "./page.module.css";
 import ToggleSwitch from "@/components/ToggleSwitch/ToggleSwitch";
 import Dropdown from "@/components/Dropdown/Dropdown";
+import Skeleton from "react-loading-skeleton";
+import "react-loading-skeleton/dist/skeleton.css";
 
 export default function Home() {
     const [inputUrl, setInputUrl] = useState<string>("");
@@ -11,6 +13,7 @@ export default function Home() {
     const [isUrlEntered, setIsUrlEntered] = useState<boolean>(false);
     const targetLength = 43;
 
+    const [isInfoLoading, setIsInfoLoading] = useState(true);
     const [isVideoEnabled, setIsVideoEnabled] = useState(true);
     const [isAudioEnabled, setIsAudioEnabled] = useState(true);
 
@@ -128,6 +131,7 @@ export default function Home() {
     }
 
     async function getVideoInfo(input: string) {
+        setIsInfoLoading(true);
         console.log("Getting video info for URL:", input);
         fetch("http://localhost:8080/info", {
             method: "POST",
@@ -149,6 +153,7 @@ export default function Home() {
             .then((data) => {
                 console.log(data);
                 setVideoInfo(data);
+                setIsInfoLoading(false);
             })
             .catch((error) => {
                 const e = error as Error;
@@ -179,36 +184,70 @@ export default function Home() {
                     <div className={`${styles.title} ${isUrlEntered ? styles.urlSubmitted : ""}`}>ViDrop</div>
                     <input className={styles.input_line} onChange={onChangeUrl} type="text" placeholder="Paste Your URL..."></input>
                 </div>
+
                 <div className={`${styles.main_page} ${isUrlEntered ? styles.urlSubmitted : ""}`}>
                     <div className={styles.info_container}>
                         <div ref={videoContainerRef} className={styles.video_container}>
-                            <img src={videoInfo?.thumbnail} alt={videoInfo?.title} />
-                            <div className={styles.video_name}>{videoInfo?.title}</div>
+                            {isInfoLoading ? (
+                                <>
+                                    <Skeleton
+                                        baseColor="#30303a"
+                                        highlightColor="#7f7f89"
+                                        style={{ aspectRatio: "16/9", width: "100%", borderRadius: "8px" }}
+                                        containerClassName={styles.skeleton_image}
+                                    />
+                                    <div className={styles.video_name}>
+                                        <Skeleton baseColor="#30303a" highlightColor="#7f7f89" count={2} style={{ marginTop: "10px" }} />
+                                    </div>
+                                </>
+                            ) : (
+                                <>
+                                    <img src={videoInfo?.thumbnail} alt={videoInfo?.title} />
+                                    <div className={styles.video_name}>{videoInfo?.title}</div>
+                                </>
+                            )}
                         </div>
+
                         <div ref={controlContainerRef} className={styles.control_container}>
                             <div className={styles.control_row}>
                                 <div className={styles.section_name}>Video</div>
                                 <ToggleSwitch checked={isVideoEnabled} onChange={() => setIsVideoEnabled(!isVideoEnabled)} />
                             </div>
                             <div className={styles.control_row}>
-                                <Dropdown
-                                    options={videoInfo?.resolutions}
-                                    setSelectedOption={setSelectedResolution}
-                                    selectedOption={selectedResolution}
-                                    postfix="p"
-                                />
+                                {isInfoLoading ? (
+                                    <Skeleton
+                                        style={{ height: "5rem", width: "25rem", borderRadius: "2.5rem" }}
+                                        highlightColor="#7f7f89"
+                                        baseColor="#30303a"
+                                    />
+                                ) : (
+                                    <Dropdown
+                                        options={videoInfo?.resolutions}
+                                        setSelectedOption={setSelectedResolution}
+                                        selectedOption={selectedResolution}
+                                        postfix="p"
+                                    />
+                                )}
                             </div>
                             <div className={styles.control_row}>
                                 <div className={styles.section_name}>Audio</div>
                                 <ToggleSwitch checked={isAudioEnabled} onChange={() => setIsAudioEnabled(!isAudioEnabled)} />
                             </div>
                             <div className={styles.control_row}>
-                                <Dropdown
-                                    options={videoInfo?.audio_bitrates}
-                                    setSelectedOption={setSelectedBitrate}
-                                    selectedOption={selectedBitrate}
-                                    postfix="kbps"
-                                />
+                                {isInfoLoading ? (
+                                    <Skeleton
+                                        style={{ height: "5rem", width: "25rem", borderRadius: "2.5rem" }}
+                                        highlightColor="#7f7f89"
+                                        baseColor="#30303a"
+                                    />
+                                ) : (
+                                    <Dropdown
+                                        options={videoInfo?.audio_bitrates}
+                                        setSelectedOption={setSelectedBitrate}
+                                        selectedOption={selectedBitrate}
+                                        postfix="kbps"
+                                    />
+                                )}
                             </div>
                             <div className={styles.download_extension_button}>
                                 <button className={styles.download_button} onClick={downloadVideo}>
@@ -222,6 +261,7 @@ export default function Home() {
                                         Download
                                     </span>
                                 </button>
+
                                 <Dropdown
                                     options={["mp4", "mp3", "avi"]}
                                     className={styles.extension_button}
