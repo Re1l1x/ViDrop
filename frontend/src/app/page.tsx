@@ -11,7 +11,7 @@ export default function Home() {
     const [inputUrl, setInputUrl] = useState<string>("");
 
     const [isUrlEntered, setIsUrlEntered] = useState<boolean>(false);
-    const targetLength = 43;
+    const targetLength = 30;
 
     const [isInfoLoading, setIsInfoLoading] = useState(true);
     const [isVideoEnabled, setIsVideoEnabled] = useState(true);
@@ -74,7 +74,7 @@ export default function Home() {
     }
 
     function getVideo(fileId: string) {
-        window.location.href = `http://localhost:8080/file/${fileId}.${selectedExtension}`;
+        window.location.href = `http://localhost:8080/file/${fileId}`;
     }
 
     useEffect(() => {
@@ -256,7 +256,9 @@ export default function Home() {
                                     </span>
                                     <span
                                         className={styles.progress_layer}
-                                        style={{ clipPath: `inset(0 ${100 - (videoStatus?.progress ?? 0)}% 0 0)` }}
+                                        style={{
+                                            clipPath: `inset(0 ${videoStatus?.status == "downloading" ? 100 - (videoStatus?.progress ?? 0) : "100"}% 0 0)`,
+                                        }}
                                     >
                                         Download
                                     </span>
